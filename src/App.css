@@ -1,38 +1,38 @@
-.App {
+/* Add a black background color to the top navigation */
+.topnav {
+  background-color: #333;
+  overflow: hidden;
+  height: "64px";
+}
+
+.sidenav {
+  background-color: #333;
+  height: calc(100vh - 64px);
+}
+
+.container {
+  background-color: #333;
+}
+
+/* Style the links inside the navigation bar */
+.topnav a {
+  float: left;
+  color: rgb(238, 130, 139);
   text-align: center;
+  padding: 8px 16px;
+  text-decoration: none;
+  font-size: 34px;
+  font-weight: bold;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.sidenav ul {
+  max-width: 100%;
+  overflow: hidden;
+  margin: 16px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.sidenav li {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
 }
