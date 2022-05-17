@@ -13,12 +13,11 @@ import {
 } from "@nextui-org/react";
 import { StyledBadge } from "./StyledBadge";
 import "./Tasks.css";
-import { ModalCreateDAO } from "./common/modalCreateDAO/ModalCreateDAO";
-import { Test } from "./common/modalCreateDAO/test";
 import React from "react";
 
-function Tasks() {
+function Tasks(props) {
   const [visible, setVisible] = React.useState(false);
+
   const handler = () => setVisible(true);
   const closeHandler = () => {
     setVisible(false);

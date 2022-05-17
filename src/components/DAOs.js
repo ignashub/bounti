@@ -9,17 +9,47 @@ import {
   Spacer,
   Button,
   Modal,
-  Card,
   Avatar,
   Grid,
-  Input,
 } from "@nextui-org/react";
 import { StyledBadge } from "./StyledBadge";
 import "./Tasks.css";
 import React from "react";
+import ModalCreateDAO from "./common/modalCreateDAO/ModalCreateDAO";
+import ModalAddNewDAO from "./common/modalAddNewDAO/ModalAddNewDAO";
+import ModalDAO from "./common/daoModals/ModalDAO";
 
-function DAOVotesReading() {
+function DAOVotesReading(props) {
   const [visible, setVisible] = React.useState(false);
+  const [visibleAddDAO, setVisibleAddDAO] = React.useState(false);
+  const [visibleAddNewDAO, setVisibleAddNewDAO] = React.useState(false);
+  const [visibleDAO, setVisibleDAO] = React.useState(false);
+  function createDAOHandler() {
+    setVisibleAddDAO(true);
+    console.log("test");
+  }
+
+  function onAdd(id) {
+    props.addDAO(id);
+    closeModal();
+  }
+
+  function closeModal() {
+    setVisibleAddDAO(false);
+    setVisibleAddNewDAO(false);
+    setVisibleDAO(false);
+  }
+
+  function createNewDAOHandler() {
+    setVisibleAddNewDAO(true);
+    console.log("test");
+  }
+
+  function showDAO() {
+    setVisibleDAO(true);
+    console.log("test");
+  }
+
   const handler = () => setVisible(true);
   const closeHandler = () => {
     setVisible(false);
@@ -209,6 +239,7 @@ function DAOVotesReading() {
             zoomed
             bordered
             color="gradient"
+            onClick={showDAO}
           />
         </Grid>
         <Grid>
@@ -218,6 +249,7 @@ function DAOVotesReading() {
             zoomed
             bordered
             color="gradient"
+            onClick={showDAO}
           />
         </Grid>
         <Grid>
@@ -227,6 +259,7 @@ function DAOVotesReading() {
             zoomed
             bordered
             color="gradient"
+            onClick={showDAO}
           />
         </Grid>
         <Grid>
@@ -236,6 +269,7 @@ function DAOVotesReading() {
             zoomed
             bordered
             color="gradient"
+            onClick={showDAO}
           />
         </Grid>
         <Grid>
@@ -245,6 +279,7 @@ function DAOVotesReading() {
             zoomed
             bordered
             color="gradient"
+            onClick={showDAO}
           />
         </Grid>
         <Grid>
@@ -254,6 +289,7 @@ function DAOVotesReading() {
             zoomed
             bordered
             color="gradient"
+            onClick={showDAO}
           />
         </Grid>
         <Grid>
@@ -263,12 +299,30 @@ function DAOVotesReading() {
             zoomed
             bordered
             color="gradient"
+            onClick={showDAO}
           />
         </Grid>
+        {visibleDAO && (
+          <ModalDAO id={props.id} open={visibleDAO} onClose={closeModal} />
+        )}
         <Grid.Container justify="right">
           <Button.Group color="secondary" ghost>
-            <Button>Add a DAO</Button>
-            <Button>Join a DAO</Button>
+            <Button onClick={createDAOHandler}>Add a DAO</Button>
+            <Button onClick={createNewDAOHandler}>Join a DAO</Button>
+            {visibleAddDAO && (
+              <ModalCreateDAO
+                id={props.id}
+                open={visibleAddDAO}
+                onClose={closeModal}
+              />
+            )}
+            {visibleAddNewDAO && (
+              <ModalAddNewDAO
+                id={props.id}
+                open={visibleAddNewDAO}
+                onClose={closeModal}
+              />
+            )}
           </Button.Group>
         </Grid.Container>
       </Grid.Container>

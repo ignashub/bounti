@@ -1,7 +1,7 @@
 import React from "react";
 import { Text, Button, Modal, Input, Checkbox, Radio } from "@nextui-org/react";
 
-function ModalCreateUser(props) {
+function ModalAddNewDAO(props) {
   const [selected, setSelected] = React.useState([]);
   return (
     <Modal
@@ -15,26 +15,40 @@ function ModalCreateUser(props) {
     >
       <Modal.Header>
         <Text id="modal-title" b size={18}>
-          Let's Create your Profile:
+          Join a DAO:
         </Text>
       </Modal.Header>
       <Modal.Body>
         <Text id="modal-title" b size={18}>
-          Your Name:
+          DAO's Name:
         </Text>
-        <Input placeholder="Luc Jonkers" />
+        <Input placeholder="Curve DAO" />
         <Text id="modal-title" b size={18}>
-          Your Alias/Discord/ENS:
+          DAO's Tag:
         </Text>
-        <Input labelLeft="username" placeholder="luc.jonkers.eth" />
+        <Input placeholder="CRV-DAO" />
         <Text id="modal-title" b size={18}>
-          Your Profile Picture NFT:
+          Proof of Membership:
         </Text>
-        <Input placeholder="https://opensea.io/assets/0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270/28001145" />
+        <Input placeholder="Contract Address...." />
         <Text id="modal-title" b size={18}>
-          Your Website:
+          Select the DAO Sections you participate in:
         </Text>
-        <Input labelLeft="https://" placeholder="www.lucjonkers.com" />
+        <Checkbox.Group
+          color="secondary"
+          defaultValue={["General"]}
+          value={selected}
+          onChange={setSelected}
+          size={"sm"}
+        >
+          <Checkbox value="General">General</Checkbox>
+          <Checkbox value="DeFi">DeFi</Checkbox>
+          <Checkbox value="Development">Development</Checkbox>
+          <Checkbox value="Treasury">Treasury</Checkbox>
+          <Checkbox value="Governance">Governance</Checkbox>
+          <Checkbox value="Growth">Growth</Checkbox>
+        </Checkbox.Group>
+        <Text>Your Available Sections will be: {selected.join(", ")}</Text>
         <Text id="modal-title" b size={18}>
           Select your DAO Clearance Level:
         </Text>
@@ -45,26 +59,17 @@ function ModalCreateUser(props) {
           <Radio value="D">Gold</Radio>
           <Radio value="E">God</Radio>
         </Radio.Group>
-        <Text id="modal-title" b size={18}>
-          Set a Recovery Password:
-        </Text>
-        <Input.Password
-          clearable
-          color="warning"
-          initialValue="password"
-          type="password"
-        />
       </Modal.Body>
       <Modal.Footer>
         <Button auto flat color="error" onClick={props.onClose}>
           Cancel
         </Button>
         <Button auto onClick={props.onClose}>
-          Create
+          Join DAO
         </Button>
       </Modal.Footer>
     </Modal>
   );
 }
 
-export default ModalCreateUser;
+export default ModalAddNewDAO;
