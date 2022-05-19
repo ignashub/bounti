@@ -1,6 +1,7 @@
 import React from "react";
 import { Text, Button, Modal, Input, Checkbox, Radio } from "@nextui-org/react";
 
+
 function ModalAddNewDAO(props) {
   const [selected, setSelected] = React.useState([]);
   return (
@@ -22,15 +23,15 @@ function ModalAddNewDAO(props) {
         <Text id="modal-title" b size={18}>
           DAO's Name:
         </Text>
-        <Input placeholder="Curve DAO" />
+        <Input placeholder="Curve DAO" id="DAOname"/>
         <Text id="modal-title" b size={18}>
           DAO's Tag:
         </Text>
-        <Input placeholder="CRV-DAO" />
+        <Input placeholder="CRV-DAO" id="DAOtag"/>
         <Text id="modal-title" b size={18}>
           Proof of Membership:
         </Text>
-        <Input placeholder="Contract Address...." />
+        <Input placeholder="Contract Address...." id="DAOcontract"/>
         <Text id="modal-title" b size={18}>
           Select the DAO Sections you participate in:
         </Text>
@@ -40,6 +41,7 @@ function ModalAddNewDAO(props) {
           value={selected}
           onChange={setSelected}
           size={"sm"}
+          id="DAOsections"
         >
           <Checkbox value="General">General</Checkbox>
           <Checkbox value="DeFi">DeFi</Checkbox>
