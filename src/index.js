@@ -4,6 +4,7 @@ import { BrowserRouter } from "react-router-dom";
 import { createTheme, NextUIProvider } from "@nextui-org/react";
 import "./index.css";
 import App from "./App";
+import { MoralisProvider } from "react-moralis";
 
 const theme = createTheme({
   type: "default",
@@ -25,8 +26,12 @@ const theme = createTheme({
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <BrowserRouter>
-    <NextUIProvider theme={theme}>
-      <App />
-    </NextUIProvider>
+    <MoralisProvider 
+      serverUrl="https://xzvd8khndlwr.usemoralis.com:2053/server"
+      appId="RroBltxvWPIk9uULjfRhOPt2OZu46MSW5pXBlJk7">
+      <NextUIProvider theme={theme}>
+        <App />
+      </NextUIProvider>
+    </MoralisProvider>
   </BrowserRouter>
 );
