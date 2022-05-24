@@ -28,10 +28,7 @@ contract Proposals {
     address[] public votersFor;
     address[] public votersAgainst;
 
-    function createProposal(address daoContractAddress)
-        public
-        returns (bool success)
-    {
+    function createProposal() public returns (bool success) {
         proposalsArray.push(proposalsArray.length + 1);
         Proposal storage _newProposal = proposalsMap[proposalsArray.length + 1];
         _newProposal.owner = msg.sender;
