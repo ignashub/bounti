@@ -1,4 +1,4 @@
-import React, { useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import { useMoralis } from "react-moralis";
 import { Moralis } from "moralis";
 import { Text, Button, Modal, Input, Checkbox, Radio } from "@nextui-org/react";
@@ -18,8 +18,8 @@ function ModalCreateUser(props) {
   const ethers = Moralis.web3Library;
 
   //const [image, setImage] = useState(null);
-  const [user, setUser] = useState(null);
-  const [allUsers, setUsers] = useState([]);
+  const [createUser, setcreateUser] = useState(null);
+  const [allcreateUsers, setcreateUsers] = useState([]);
 
   //variables for smart contract
   const contractAddress = "0x8a7a1605A9a3a6aFB81f7237325D3b3aead2004e";
@@ -28,16 +28,17 @@ function ModalCreateUser(props) {
   //login function Moralis
   const login = async () => {
     if (!isAuthenticated) {
-      await authenticate({ signingMessage: "Log in using Moralis" })
-        .catch(function (error) {
+      await authenticate({ signingMessage: "Log in using Moralis" }).catch(
+        function (error) {
           console.log(error);
-        });
+        }
+      );
     }
   };
 
   useEffect(() => {
-      //getAllDAOs();
-  }, [])
+    //getAllDAOs();
+  }, []);
 
   const logOut = async () => {
     await logout();
@@ -72,16 +73,20 @@ function ModalCreateUser(props) {
     await user.save();
   };
 
-      //adding dao to blockchain (this also adds the msg.sender to members array of added dao)
+  //adding dao to blockchain (this also adds the msg.sender to members array of added dao)
   const addUser = async () => {
     const { ethereum } = window;
     const provider = new ethers.providers.Web3Provider(ethereum);
     const signer = provider.getSigner();
-    const userContract = new ethers.Contract(contractAddress, contractABI, signer);
+    const userContract = new ethers.Contract(
+      contractAddress,
+      contractABI,
+      signer
+    );
     const daoContract = document.getElementById("DAOcontract").value;
-    console.log(daoContract)
+    console.log(daoContract);
     await userContract.addDao(daoContract);
-  }
+  };
 
   //Function to upload
   const upload = async () => {
@@ -105,66 +110,56 @@ function ModalCreateUser(props) {
     return response.json();
   };
 
-  //get single dao & members from that dao
-  const getUser = async () => {
-    const { ethereum } = window;
-    if (ethereum) {
-        const provider = new ethers.providers.Web3Provider(ethereum);
-        const signer = provider.getSigner();
-        const userContract = new ethers.Contract(contractAddress, contractABI, signer);
-        const userContract = document.getElementById("SelectedUser").value;
-        const user = await userContract.getDao(userContract);
-        //setDao(await dao);
-        //console.log(await dao);
-        return dao;
-      }
-  }
-
   //IPFS+AVAX get in one function, putting values together in one variable
-  const getFullUser = async () => {
-    const user = await getUser();
-    const ipfs = await getIpfsUser();
-  
-    const fullUser = {
-      user: user,
-      ipfs: ipfs
-    }
-    setUser(fullUser);
-    console.log(fullUser)
-  }
+  // const getFullUser = async () => {
+  //   const user = await getUser();
+  //   const ipfs = await getIpfsUser();
+
+  //   const fullUser = {
+  //     user: user,
+  //     ipfs: ipfs,
+  //   };
+  //   setcreateUser(fullUser);
+  //   console.log(fullUser);
+  // };
 
   //getting all daos from the blockchain
   //Addition; contract addresses need to be in correct format or else there will be a miss communication between avax and moralis
-    const getAllUsers = async () => {
-      const allUsers = [];
-      const { ethereum } = window;
-        if (ethereum) {
-          const provider = new ethers.providers.Web3Provider(ethereum);
-          const signer = provider.getSigner();
-          const userContract = new ethers.Contract(contractAddress, contractABI, signer);
-          const bc = await userContract.getAllUsers();
-          for (const user of bc) {
-            const query = new Moralis.Query("Users");
-            console.log(user)
-            console.log(user.contractAddress)
-            await query.select("CID").equalTo("contractAddress", user.contractAddress);
-            const qAnswer = await query.first();
-            console.log(qAnswer)
-            const userCID = qAnswer.attributes.CID;
-            const url = `https://gateway.moralisipfs.com/ipfs/${userCID}`;
-            const response = await fetch(url);
-            console.log(response)
-            const fullUser = {
-              bc: user,
-              ipfs: await response.json()
-            }
-            allUsers.push(fullUser)
-            console.log(fullUser)
-          }
-        setDaos(allDaos);
-        }
+  const getAllUsers = async () => {
+    const allUsers = [];
+    const { ethereum } = window;
+    if (ethereum) {
+      const provider = new ethers.providers.Web3Provider(ethereum);
+      const signer = provider.getSigner();
+      const userContract = new ethers.Contract(
+        contractAddress,
+        contractABI,
+        signer
+      );
+      const bc = await userContract.getAllUsers();
+      for (const user of bc) {
+        const query = new Moralis.Query("Users");
+        console.log(user);
+        console.log(user.contractAddress);
+        await query
+          .select("CID")
+          .equalTo("contractAddress", user.contractAddress);
+        const qAnswer = await query.first();
+        console.log(qAnswer);
+        const userCID = qAnswer.attributes.CID;
+        const url = `https://gateway.moralisipfs.com/ipfs/${userCID}`;
+        const response = await fetch(url);
+        console.log(response);
+        const fullUser = {
+          bc: user,
+          ipfs: await response.json(),
+        };
+        allUsers.push(fullUser);
+        console.log(fullUser);
+      }
+      setcreateUsers(allUsers);
     }
-
+  };
 
   return (
     <Modal
@@ -189,24 +184,45 @@ function ModalCreateUser(props) {
         <Text id="modal-title" b size={18}>
           Your Alias/Discord/ENS:
         </Text>
-        <Input labelLeft="username" placeholder="luc.jonkers.eth" id="userAlias" />
+        <Input
+          labelLeft="username"
+          placeholder="luc.jonkers.eth"
+          id="userAlias"
+        />
         <Text id="modal-title" b size={18}>
           Your Profile Picture NFT:
         </Text>
-        <Input placeholder="https://opensea.io/assets/0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270/28001145" id="userPicture"/>
+        <Input
+          placeholder="https://opensea.io/assets/0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270/28001145"
+          id="userPicture"
+        />
         <Text id="modal-title" b size={18}>
           Your Website:
         </Text>
-        <Input labelLeft="https://" placeholder="www.lucjonkers.com" id="userWebsite"/>
+        <Input
+          labelLeft="https://"
+          placeholder="www.lucjonkers.com"
+          id="userWebsite"
+        />
         <Text id="modal-title" b size={18}>
           Select your DAO Clearance Level:
         </Text>
         <Radio.Group value="General" size={"sm"} color="secondary">
-          <Radio value="General" id="userClearance">General</Radio>
-          <Radio value="Bronze" id="userClearance">Bronze</Radio>
-          <Radio value="Silver" id="userClearance">Silver</Radio>
-          <Radio value="Gold" id="userClearance">Gold</Radio>
-          <Radio value="God" id="userClearance">God</Radio>
+          <Radio value="General" id="userClearance">
+            General
+          </Radio>
+          <Radio value="Bronze" id="userClearance">
+            Bronze
+          </Radio>
+          <Radio value="Silver" id="userClearance">
+            Silver
+          </Radio>
+          <Radio value="Gold" id="userClearance">
+            Gold
+          </Radio>
+          <Radio value="God" id="userClearance">
+            God
+          </Radio>
         </Radio.Group>
         {/* <Text id="modal-title" b size={18}>
           Set a Recovery Password:

@@ -14,11 +14,20 @@ contract UserContract {
     address[] usersArray;
     mapping(address => User) usersMap;
 
+    // @dev Checks if the message sender is a task owner
+    modifier isAlreadyInArray() {
+        if (msg.sender == usersMap[msg.sender].contractAddress) {
+            revert("This user already exists in the array");
+        }
+        _;
+    }
+
     /**
      * @dev adding User to the array. msg.sender is the connected user via web3provider (wallet)
      */
-    function addUser() public {
+    function addUser() public isAlreadyInArray {
         usersArray.push(msg.sender);
+        usersMap[msg.sender].contractAddress = msg.sender;
     }
 
     /**
@@ -32,8 +41,8 @@ contract UserContract {
     /**
      * @dev Get user from provided contract address
      */
-    function getUser(address dao) public view returns (User memory) {
-        return usersMap[dao];
+    function getUser(address user) public view returns (User memory) {
+        return usersMap[user];
     }
 
     /**
