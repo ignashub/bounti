@@ -18,8 +18,8 @@ function ModalCreateUser(props) {
   const ethers = Moralis.web3Library;
 
   //const [image, setImage] = useState(null);
-  const [dao, setDao] = useState(null);
-  const [allDaos, setDaos] = useState([]);
+  const [user, setUser] = useState(null);
+  const [allUsers, setUsers] = useState([]);
 
   //variables for smart contract
   const contractAddress = "0x8a7a1605A9a3a6aFB81f7237325D3b3aead2004e";
@@ -67,9 +67,9 @@ function ModalCreateUser(props) {
 
     await file.saveIPFS();
 
-    dao.set("CID", file.hash());
-    dao.set("contractAddress", contract);
-    await dao.save();
+    user.set("CID", file.hash());
+    user.set("contractAddress", contract);
+    await user.save();
   };
 
       //adding dao to blockchain (this also adds the msg.sender to members array of added dao)
@@ -86,19 +86,19 @@ function ModalCreateUser(props) {
   //Function to upload
   const upload = async () => {
     await uploadMetadata();
-    await addDAO();
+    await addUser();
     props.onClose();
   };
 
   //Function to get saved info from ipfs
-  const getIpfsDAO = async () => {
-    const query = new Moralis.Query("DAOs");
+  const getIpfsUser = async () => {
+    const query = new Moralis.Query("Users");
 
-    const daoContract = document.getElementById("SelectedDAO").value;
-    query.equalTo("contractAddress", daoContract);
-    const dao = await query.first();
-    const daoCID = dao.attributes.CID;
-    const url = `https://gateway.moralisipfs.com/ipfs/${daoCID}`;
+    const userContract = document.getElementById("SelectedUser").value;
+    query.equalTo("contractAddress", userContract);
+    const user = await query.first();
+    const userCID = user.attributes.CID;
+    const url = `https://gateway.moralisipfs.com/ipfs/${userCID}`;
     const response = await fetch(url);
     //setIpfsDAO(await response.json());
     //console.log(await response.json());
@@ -106,14 +106,14 @@ function ModalCreateUser(props) {
   };
 
   //get single dao & members from that dao
-  const getDAO = async () => {
+  const getUser = async () => {
     const { ethereum } = window;
     if (ethereum) {
         const provider = new ethers.providers.Web3Provider(ethereum);
         const signer = provider.getSigner();
         const userContract = new ethers.Contract(contractAddress, contractABI, signer);
-        const daoContract = document.getElementById("SelectedDAO").value;
-        const dao = await userContract.getDao(daoContract);
+        const userContract = document.getElementById("SelectedUser").value;
+        const user = await userContract.getDao(userContract);
         //setDao(await dao);
         //console.log(await dao);
         return dao;
@@ -121,59 +121,48 @@ function ModalCreateUser(props) {
   }
 
   //IPFS+AVAX get in one function, putting values together in one variable
-  const getFullDAO = async () => {
-    const dao = await getDAO();
-    const ipfs = await getIpfsDAO();
+  const getFullUser = async () => {
+    const user = await getUser();
+    const ipfs = await getIpfsUser();
   
-    const fullDAO = {
-      dao: dao,
+    const fullUser = {
+      user: user,
       ipfs: ipfs
     }
-    setDao(fullDAO);
-    //console.log(fullDAO)
+    setUser(fullUser);
+    console.log(fullUser)
   }
 
   //getting all daos from the blockchain
   //Addition; contract addresses need to be in correct format or else there will be a miss communication between avax and moralis
-    const getAllDAOs = async () => {
-      const allDaos = [];
+    const getAllUsers = async () => {
+      const allUsers = [];
       const { ethereum } = window;
         if (ethereum) {
           const provider = new ethers.providers.Web3Provider(ethereum);
           const signer = provider.getSigner();
           const userContract = new ethers.Contract(contractAddress, contractABI, signer);
-          const bc = await userContract.getAllDaos();
-          for (const dao of bc) {
-            const query = new Moralis.Query("DAOs");
-            console.log(dao)
-            console.log(dao.contractAddress)
-            await query.select("CID").equalTo("contractAddress", dao.contractAddress);
+          const bc = await userContract.getAllUsers();
+          for (const user of bc) {
+            const query = new Moralis.Query("Users");
+            console.log(user)
+            console.log(user.contractAddress)
+            await query.select("CID").equalTo("contractAddress", user.contractAddress);
             const qAnswer = await query.first();
             console.log(qAnswer)
-            const daoCID = qAnswer.attributes.CID;
-            const url = `https://gateway.moralisipfs.com/ipfs/${daoCID}`;
+            const userCID = qAnswer.attributes.CID;
+            const url = `https://gateway.moralisipfs.com/ipfs/${userCID}`;
             const response = await fetch(url);
             console.log(response)
-            const fullDAO = {
-              bc: dao,
+            const fullUser = {
+              bc: user,
               ipfs: await response.json()
             }
-            allDaos.push(fullDAO)
-            console.log(fullDAO)
+            allUsers.push(fullUser)
+            console.log(fullUser)
           }
         setDaos(allDaos);
         }
-    }
-
-    // joining a dao
-    const JoinDAO = async () => {
-      const { ethereum } = window;
-      const provider = new ethers.providers.Web3Provider(ethereum);
-      const signer = provider.getSigner();
-      const userContract = new ethers.Contract(contractAddress, contractABI, signer);
-      const daoContract = document.getElementById("DAOcontract").value;
-  
-      await userContract.joinDao(daoContract);
     }
 
 
