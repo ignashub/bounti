@@ -8,103 +8,150 @@ pragma solidity >=0.7.0 <0.9.0;
  * @custom:dev-run-script ./scripts/deploy_with_ethers.ts
  */
 contract Proposals {
+    //do proposal status, check tasks
     struct Proposal {
         address daoContractAddress;
         address owner;
-        Voter[] Voters;
-        uint256 id;
+        string id;
+        Voter[] votersFor;
+        Voter[] votersAgainst;
     }
 
     struct Voter {
         address voterAddress;
         uint256 weight; // weight is accumulated by delegation
-        bool voted; // if true, that person already voted
     }
 
-    mapping(address => Voter) public voters;
-    mapping(uint256 => Proposal) public proposalsMap;
+    mapping(string => Proposal) public proposalsMap;
 
-    uint256[] public proposalsArray;
-    address[] public votersFor;
-    address[] public votersAgainst;
+    //mapping(string => mapping(address => bool))
 
-    function createProposal() public returns (bool success) {
-        proposalsArray.push(proposalsArray.length + 1);
-        Proposal storage _newProposal = proposalsMap[proposalsArray.length + 1];
-        _newProposal.owner = msg.sender;
-        _newProposal.id = proposalsArray.length + 1;
-        voteFor(_newProposal.id);
-        return true;
-    }
+    string[] public proposalsArray;
 
-    function getAllProposals() public view returns (uint256[] memory) {
-        return proposalsArray;
-    }
-
-    function getProposal(uint256 id) public view returns (Proposal memory) {
-        return proposalsMap[id];
-    }
-
-    function removeProposal(uint256 id) public returns (bool succes) {
-        if (msg.sender == proposalsMap[id].owner) {
-            delete proposalsMap[id];
-            for (uint256 i = 0; i < proposalsArray.length; i++) {
-                if (proposalsArray[i] == id) {
-                    delete proposalsArray[i];
-                    return true;
+    //2nd parameter voter address, so we could use this in getvoter
+    modifier checkVoter(string calldata id) {
+        bool voterExists = false;
+        for (uint256 i = 0; i < proposalsMap[id].votersFor.length; i++) {
+            if (proposalsMap[id].votersFor[i].voterAddress == msg.sender) {
+                voterExists = true;
+                _;
+                break;
+            }
+        }
+        if (!voterExists) {
+            for (
+                uint256 i = 0;
+                i < proposalsMap[id].votersAgainst.length;
+                i++
+            ) {
+                if (
+                    proposalsMap[id].votersAgainst[i].voterAddress == msg.sender
+                ) {
+                    voterExists = true;
+                    _;
+                    break;
                 }
             }
         }
-        return false;
+        if (!voterExists) {
+            revert("Voter does not exists");
+        }
     }
 
-    function checkVoter(uint256 id, address voter)
+    modifier checkProposalOwner(string calldata objectId) {
+        if (msg.sender == proposalsMap[objectId].owner) {
+            _;
+        } else {
+            revert("You are not the proposal owner");
+        }
+    }
+
+    //create modifier if the proposal already exists
+    function createProposal(string calldata objectId) public {
+        proposalsArray.push(objectId);
+        Proposal storage _newProposal = proposalsMap[objectId];
+        _newProposal.owner = msg.sender;
+        _newProposal.id = objectId;
+        _newProposal.votersFor.push(
+            Voter({voterAddress: msg.sender, weight: 1})
+        );
+    }
+
+    function getAllProposals() public view returns (string[] memory) {
+        return proposalsArray;
+    }
+
+    function getProposal(string calldata objectId)
         public
         view
-        returns (bool success)
+        returns (Proposal memory)
     {
-        for (uint256 i = 0; i < proposalsMap[id].Voters.length; i++) {
-            if (proposalsMap[id].Voters[i].voterAddress == voter) {
-                return true;
-            } else {
-                return false;
+        return proposalsMap[objectId];
+    }
+
+    function removeProposal(string calldata objectId)
+        public
+        checkProposalOwner(objectId)
+    {
+        delete proposalsMap[objectId];
+        for (uint256 i = 0; i < proposalsArray.length; i++) {
+            if (proposalsArray[i] == objectId) {
+                delete proposalsArray[i];
             }
         }
     }
 
-    function getVoter(uint256 id, address voterAddress)
+    //check if the person is already a voter in this proposal
+    function getVoter(string calldata objectId, address voterAddress)
         public
         view
         returns (Voter memory voter)
     {
-        for (uint256 i = 0; i < proposalsMap[id].Voters.length; i++) {
-            if (proposalsMap[id].Voters[i].voterAddress == voterAddress) {
-                return voter;
+        for (uint256 i = 0; i < proposalsMap[objectId].votersFor.length; i++) {
+            if (
+                proposalsMap[objectId].votersFor[i].voterAddress == voterAddress
+            ) {
+                for (
+                    uint256 j = 0;
+                    j < proposalsMap[objectId].votersAgainst.length;
+                    j++
+                ) {
+                    if (
+                        proposalsMap[objectId].votersAgainst[j].voterAddress ==
+                        voterAddress
+                    ) {
+                        return voter;
+                    }
+                }
             }
         }
     }
 
-    function voteFor(uint256 proposal) public returns (bool success) {
-        if (checkVoter(proposal, msg.sender) == false) {
-            proposalsMap[proposal].Voters.push(
-                Voter({voterAddress: msg.sender, voted: true, weight: 1})
-            );
-            votersFor.push(msg.sender);
-            return true;
-        } else {
-            return false;
-        }
+    function voteFor(string calldata objectId) public checkVoter(objectId) {
+        proposalsMap[objectId].votersFor.push(
+            Voter({voterAddress: msg.sender, weight: 1})
+        );
     }
 
-    function voteAgains(uint256 proposal) public returns (bool success) {
-        if (checkVoter(proposal, msg.sender) == false) {
-            proposalsMap[proposal].Voters.push(
-                Voter({voterAddress: msg.sender, voted: true, weight: 1})
-            );
-            votersAgainst.push(msg.sender);
-            return true;
-        } else {
-            return false;
-        }
+    function voteAgainst(string calldata objectId) public checkVoter(objectId) {
+        proposalsMap[objectId].votersAgainst.push(
+            Voter({voterAddress: msg.sender, weight: 1})
+        );
+    }
+
+    function voteForCount(string calldata objectId)
+        public
+        view
+        returns (uint256)
+    {
+        return proposalsMap[objectId].votersFor.length;
+    }
+
+    function voteAgainstCount(string calldata objectId)
+        public
+        view
+        returns (uint256)
+    {
+        return proposalsMap[objectId].votersFor.length;
     }
 }
