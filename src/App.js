@@ -15,6 +15,8 @@ import {
   Link,
 } from "@nextui-org/react";
 import "./App.css";
+import { useSelector, useDispatch } from 'react-redux';
+import { decrement, increment } from './state/counterSlice';
 
 import {
   ListBulletIcon,
@@ -24,8 +26,19 @@ import {
 } from "@radix-ui/react-icons";
 
 function App() {
+  // this is done only for testing purposes for State Management
+  const count = useSelector((state) => state.counter.value)
+  const dispatch = useDispatch()
+
+  const method = async() => {
+    await dispatch(increment());
+    console.log("This is the count value from State Management: ", count);
+  }
+
   return (
     <Grid.Container className="container">
+      {/*This button is added only for test purposes and will be removed*/}
+      {/*<Button onClick={method}>Increase value</Button>*/}
       {/* Topbar */}
       <Grid xs={12}>
         <Grid.Container

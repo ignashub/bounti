@@ -4,6 +4,8 @@ import { BrowserRouter } from "react-router-dom";
 import { createTheme, NextUIProvider } from "@nextui-org/react";
 import "./index.css";
 import App from "./App";
+import { Provider } from 'react-redux';
+import store from './state/store';
 
 const theme = createTheme({
   type: "default",
@@ -26,7 +28,9 @@ const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <BrowserRouter>
     <NextUIProvider theme={theme}>
-      <App />
+      <Provider store={store}>
+        <App />
+      </Provider>
     </NextUIProvider>
   </BrowserRouter>
 );
