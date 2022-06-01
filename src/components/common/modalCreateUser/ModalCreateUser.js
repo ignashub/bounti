@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useMoralis } from "react-moralis";
 import { Moralis } from "moralis";
 import { Text, Button, Modal, Input, Checkbox, Radio } from "@nextui-org/react";
+import abi from "../../../utils/Users.json";
 
 function ModalCreateUser(props) {
   const [selected, setSelected] = React.useState([]);
@@ -22,7 +23,7 @@ function ModalCreateUser(props) {
   const [allcreateUsers, setcreateUsers] = useState([]);
 
   //variables for smart contract
-  const contractAddress = "0x8a7a1605A9a3a6aFB81f7237325D3b3aead2004e";
+  const contractAddress = "0xd9145CCE52D386f254917e481eB44e9943F39138";
   const contractABI = abi.abi;
 
   //login function Moralis
@@ -69,7 +70,6 @@ function ModalCreateUser(props) {
     await file.saveIPFS();
 
     user.set("CID", file.hash());
-    user.set("contractAddress", contract);
     await user.save();
   };
 
@@ -105,8 +105,6 @@ function ModalCreateUser(props) {
     const userCID = user.attributes.CID;
     const url = `https://gateway.moralisipfs.com/ipfs/${userCID}`;
     const response = await fetch(url);
-    //setIpfsDAO(await response.json());
-    //console.log(await response.json());
     return response.json();
   };
 
