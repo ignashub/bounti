@@ -15,6 +15,7 @@ import {
   Link,
 } from "@nextui-org/react";
 import "./App.css";
+// There we get everything for StateManagement
 import { useSelector, useDispatch } from 'react-redux';
 import { decrement, increment } from './state/counterSlice';
 
