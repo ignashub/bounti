@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useMoralis } from "react-moralis";
 import { Moralis } from "moralis";
-import { Text, Button, Modal, Input, Checkbox, Radio } from "@nextui-org/react";
+import { Text, Button, Modal, Input, Radio } from "@nextui-org/react";
 import abi from "../../../utils/Users.json";
 
 function ModalCreateUser(props) {
-  const [selected, setSelected] = React.useState([]);
   const [userName, setUserName] = useState("");
   const [userAlias, setUserAlias] = useState("");
   const [userPicture, setUserPicture] = useState(null);
@@ -93,20 +92,22 @@ function ModalCreateUser(props) {
     await userContract.addUser(userAddress);
   };
 
-    //Upload an image
-    const uploadImage = async () => {
-      const CIDImage = Moralis.Object.extend("CIDImage");
-      const cidimage = new CIDImage();
-  
-      const data = userPicture[0];
-      const file = new Moralis.File(data.name, data);
-      await file.saveIPFS();
-  
-      cidimage.set("cid", file.hash());
-      await cidimage.save();
-  
-      return file.ipfs(); //url where is the image is stored
-    };
+  //Upload an image
+  const uploadImage = async () => {
+    const CIDImage = Moralis.Object.extend("CIDImage");
+    const cidimage = new CIDImage();
+
+    // const data = fileInput.files[0];
+    const data = userPicture[0];
+    console.log(data);
+    const file = new Moralis.File(data.name, data);
+    await file.saveIPFS();
+
+    cidimage.set("cid", file.hash());
+    await cidimage.save();
+
+    return file.ipfs(); //url where is the image is stored
+  };
   
 
   //Function to upload
@@ -213,7 +214,7 @@ function ModalCreateUser(props) {
         </Text>
         <Input type="file"
           placeholder="https://opensea.io/assets/0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270/28001145"
-          onChange={e => setUserPicture(e.target.value)} value={userPicture}
+          onChange={(e) => setUserPicture(e.target.files)}
         />
         <Text id="modal-title" b size={18}>
           Your Website:
