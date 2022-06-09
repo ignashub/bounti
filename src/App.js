@@ -1,6 +1,7 @@
 import Tasks from "./components/Tasks";
 import DAOs from "./components/DAOs";
 import Stake from "./components/Stake";
+import Profile from "./components/Profile";
 import Dashboard from "./components/Dashboard";
 
 import React from "react";
@@ -15,25 +16,25 @@ import {
   Link,
 } from "@nextui-org/react";
 import "./App.css";
-import { useSelector, useDispatch } from 'react-redux';
-import { decrement, increment } from './state/counterSlice';
+import { useSelector, useDispatch } from "react-redux";
+import { decrement, increment } from "./state/counterSlice";
 
 import {
   ListBulletIcon,
   DashboardIcon,
   LayersIcon,
-  AngleIcon,
+  PersonIcon,
 } from "@radix-ui/react-icons";
 
 function App() {
   // this is done only for testing purposes for State Management
-  const count = useSelector((state) => state.counter.value)
-  const dispatch = useDispatch()
+  const count = useSelector((state) => state.counter.value);
+  const dispatch = useDispatch();
 
-  const method = async() => {
+  const method = async () => {
     await dispatch(increment());
     console.log("This is the count value from State Management: ", count);
-  }
+  };
 
   return (
     <Grid.Container className="container">
@@ -99,9 +100,9 @@ function App() {
 
           <Text color css={{ color: "white" }}>
             <li>
-              <ReactLink to="Stake">
-                <AngleIcon />
-                Stake
+              <ReactLink to="Profile">
+                <PersonIcon />
+                Profile
                 <Spacer y={2} />
               </ReactLink>
             </li>
@@ -115,7 +116,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/tasks" element={<Tasks />} />
-            <Route path="/stake" element={<Stake />} />
+            <Route path="/profile" element={<Profile />} />
             <Route path="/daos" element={<DAOs />} />
           </Routes>
         </Card>
