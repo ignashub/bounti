@@ -133,7 +133,6 @@ contract Proposals {
         _;
     }
 
-    //create modifier if the proposal already exists
     function createProposal(string calldata objectId, uint256 completeThreshold)
         public
         proposalDoesntExists(objectId)
@@ -149,6 +148,23 @@ contract Proposals {
         _newProposal.votersFor.push(
             Voter({voterAddress: msg.sender, weight: 1})
         );
+    }
+
+    //completes proposal
+    //compare if votersFor is bigger than the treshold.
+    // votersFor / Daos.getMembersNumber >= threshold
+    function completeProposal(string calldata objectId)
+        public
+        proposalDoesntExists(objectId)
+        emptyProposal(objectId)
+        checkTaskStatus(objectId, ProposalStatus.IN_PROCESS)
+    {
+        uint256 votersForNumber = votersForCount(objectId);
+        uint256 membersNumber = Daos.getMembersNumber();
+        uint256 votersForAmount = membersNumber / votersForNumber;
+        if (votersForAmount >= proposalsMap[objectId].completeThreshold) {
+            proposalsMap[objectId].status = ProposalStatus.COMPLETED;
+        }
     }
 
     function getAllProposals() public view returns (string[] memory) {
@@ -238,7 +254,7 @@ contract Proposals {
         );
     }
 
-    function votedForCount(string calldata objectId)
+    function votersForCount(string calldata objectId)
         public
         view
         checkProposalExists(objectId)
@@ -247,7 +263,7 @@ contract Proposals {
         return proposalsMap[objectId].votersFor.length;
     }
 
-    function votedAgainstCount(string calldata objectId)
+    function votersAgainstCount(string calldata objectId)
         public
         view
         checkProposalExists(objectId)

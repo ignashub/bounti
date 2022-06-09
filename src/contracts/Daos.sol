@@ -118,13 +118,14 @@ contract Daos {
     }
 }
 
-// SPDX-License-Identifier: MIT
+//SPDX-License-Identifier: MIT
 // pragma solidity ^0.8.0;
 // // NOTE: Deploy this contract first
 // contract B {
 //     struct Dao{
 //         //Every DAO has address & list of members
 //         address contractAddress;
+//         mapping (address => bool) callers;
 //         address[] membersArray; //To index
 //         //Taken away to allow getAllDaos
 //         //mapping(address => address) membersMapping; //Used mapping to be able ot search for users by address
@@ -134,15 +135,24 @@ contract Daos {
 //     address[] daosArray; //To get all DAO contract address
 //     mapping(address => Dao) daosMap; //to search by DAO and get members
 
+//     modifier isRightCaller() {
+//         require(callers[msg.sender], "You are not allowed to execute this call");
+//         _;
+//     }
+
 //         /**
 //      * @dev Get members number from a certain DAO
 //      */
-//     function getMembersNumber(address dao) external view returns(uint256) {
+//     function getMembersNumber(address dao) isRightCaller external view returns(uint256) {
 //         return daosMap[dao].membersArray.length;
 //     }
 //     function joinDao(address dao) public returns(bool success) {
+
 //         daosMap[dao].membersArray.push(msg.sender);
 //         return true;
+//     }
+//     function setCaller() onlyOwner public {
+//         callers[msg.sender] = true;
 //     }
 // }
 

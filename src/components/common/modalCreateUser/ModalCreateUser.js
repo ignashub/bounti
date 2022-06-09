@@ -10,6 +10,8 @@ function ModalCreateUser(props) {
   const [userPicture, setUserPicture] = useState(null);
   const [userWebsite, setUserWebsite] = useState("");
   const [userClearance, setUserClearance] = useState("");
+  const [createUser, setcreateUser] = useState(null);
+  const [allcreateUsers, setcreateUsers] = useState([]);
 
   const {
     authenticate,
@@ -21,10 +23,6 @@ function ModalCreateUser(props) {
   } = useMoralis();
 
   const ethers = Moralis.web3Library;
-
-  //const [image, setImage] = useState(null);
-  const [createUser, setcreateUser] = useState(null);
-  const [allcreateUsers, setcreateUsers] = useState([]);
 
   //variables for smart contract
   const contractAddress = "0xd9145CCE52D386f254917e481eB44e9943F39138";
@@ -49,7 +47,7 @@ function ModalCreateUser(props) {
     await logout();
   };
 
-  //   Upload metadata object: name, description, image
+  //   Upload metadata of an User
   const uploadMetadata = async (imageURL) => {
     const User = Moralis.Object.extend("Users");
     const user = new User();
@@ -97,7 +95,6 @@ function ModalCreateUser(props) {
     const CIDImage = Moralis.Object.extend("CIDImage");
     const cidimage = new CIDImage();
 
-    // const data = fileInput.files[0];
     const data = userPicture[0];
     console.log(data);
     const file = new Moralis.File(data.name, data);
