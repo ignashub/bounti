@@ -3,7 +3,7 @@ import DAOs from "./components/DAOs";
 import Stake from "./components/Stake";
 import Dashboard from "./components/Dashboard";
 
-import React from "react";
+import React, {useState} from "react";
 import { Routes, Link as ReactLink, Route } from "react-router-dom";
 import {
   Grid,
@@ -15,6 +15,7 @@ import {
   Link,
 } from "@nextui-org/react";
 import "./App.css";
+import { useMoralis } from "react-moralis";
 
 import {
   ListBulletIcon,
@@ -24,6 +25,30 @@ import {
 } from "@radix-ui/react-icons";
 
 function App() {
+  const {
+    authenticate,
+    isAuthenticated,
+    isAuthenticating,
+    user,
+    account,
+    logout,
+  } = useMoralis();
+
+  const [connectedUser, setconnectedUser] = useState("");
+
+  //login function Moralis
+  const login = async () => {
+    if (!isAuthenticated) {
+      await authenticate({ signingMessage: "Log in using Moralis" })
+        .catch(function (error) {
+          console.log(error);
+        });
+    }
+    setconnectedUser(user.get('ethAddress'));
+    console.log(user);
+    console.log(user.get('ethAddress'));
+  };
+  
   return (
     <Grid.Container className="container">
       {/* Topbar */}
@@ -42,7 +67,7 @@ function App() {
                 <Input placeholder="Search" />
               </Grid>
               <Grid>
-                <Button>Account</Button>
+                <Button auto onClick={login}>Account</Button>
               </Grid>
             </Grid.Container>
           </Grid>
@@ -102,7 +127,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/tasks" element={<Tasks />} />
-            <Route path="/stake" element={<Stake />} />
+            <Route path="/stake" element={<Stake connectedUser={connectedUser} />} />
             <Route path="/daos" element={<DAOs />} />
           </Routes>
         </Card>
