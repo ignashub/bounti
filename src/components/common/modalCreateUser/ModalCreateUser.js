@@ -25,7 +25,7 @@ function ModalCreateUser(props) {
   const ethers = Moralis.web3Library;
 
   //variables for smart contract
-  const contractAddress = "0xd9145CCE52D386f254917e481eB44e9943F39138";
+  const contractAddress = "0xF4A3dc8e7E2dc1f0CB000aDBe2C13f7CF5632811";
   const contractABI = abi.abi;
 
   //login function Moralis
@@ -50,7 +50,7 @@ function ModalCreateUser(props) {
   //   Upload metadata of an User
   const uploadMetadata = async (imageURL) => {
     const User = Moralis.Object.extend("Users");
-    const user = new User();
+    const userObject = new User();
     const tasksIds = [];
     const proposalsIds = [];
 
@@ -70,9 +70,10 @@ function ModalCreateUser(props) {
 
     await file.saveIPFS();
 
-    user.set("CID", file.hash());
+    userObject.set("CID", file.hash());
+    userObject.set("contractAddress", user.get("ethAddress"));
     console.log(file);
-    await user.save();
+    await userObject.save();
   };
 
   //adding user to blockchain
@@ -85,9 +86,9 @@ function ModalCreateUser(props) {
       contractABI,
       signer
     );
-    const userAddress = props.connectedUser;
+    const userAddress = user.get("ethAddress");
     console.log(userAddress);
-    await userContract.addUser(userAddress);
+    // await userContract.addUser();
   };
 
   //Upload an image
@@ -105,7 +106,6 @@ function ModalCreateUser(props) {
 
     return file.ipfs(); //url where is the image is stored
   };
-  
 
   //Function to upload
   const upload = async () => {
@@ -118,30 +118,46 @@ function ModalCreateUser(props) {
   //Function to get saved info from ipfs
   const getIpfsUser = async () => {
     const query = new Moralis.Query("Users");
-
-    const userContract = document.getElementById("SelectedUser").value;
+    const userContract = user.get("ethAddress");
     query.equalTo("contractAddress", userContract);
-    const user = await query.first();
-    const userCID = user.attributes.CID;
+    const userMoralis = await query.first();
+    const userCID = userMoralis.attributes.CID;
     const url = `https://gateway.moralisipfs.com/ipfs/${userCID}`;
     const response = await fetch(url);
     return response.json();
   };
 
-  //IPFS+AVAX get in one function, putting values together in one variable
-  // const getFullUser = async () => {
-  //   const user = await getUser();
-  //   const ipfs = await getIpfsUser();
+  //get single user from the blockchain
+  const getUser = async () => {
+    const userAddress = user.get("ethAddress");
+    const { ethereum } = window;
+    if (ethereum) {
+      const provider = new ethers.providers.Web3Provider(ethereum);
+      const signer = provider.getSigner();
+      const userContract = new ethers.Contract(
+        contractAddress,
+        contractABI,
+        signer
+      );
+      const userBlockchain = await userContract.getUser(userAddress);
+      return userBlockchain;
+    }
+  };
 
-  //   const fullUser = {
-  //     user: user,
-  //     ipfs: ipfs,
-  //   };
-  //   setcreateUser(fullUser);
-  //   console.log(fullUser);
-  // };
+  // IPFS+AVAX get in one function, putting values together in one variable
+  const getFullUser = async () => {
+    const user = await getUser();
+    const ipfs = await getIpfsUser();
 
-  //getting all daos from the blockchain
+    const fullUser = {
+      user: user,
+      ipfs: ipfs,
+    };
+    setcreateUser(fullUser);
+    console.log(fullUser);
+  };
+
+  //getting all users from the blockchain
   //Addition; contract addresses need to be in correct format or else there will be a miss communication between avax and moralis
   const getAllUsers = async () => {
     const allUsers = [];
@@ -154,8 +170,8 @@ function ModalCreateUser(props) {
         contractABI,
         signer
       );
-      const bc = await userContract.getAllUsers();
-      for (const user of bc) {
+      const uc = await userContract.getAllUsers();
+      for (const user of uc) {
         const query = new Moralis.Query("Users");
         console.log(user);
         console.log(user.contractAddress);
@@ -169,7 +185,7 @@ function ModalCreateUser(props) {
         const response = await fetch(url);
         console.log(response);
         const fullUser = {
-          bc: user,
+          uc: user,
           ipfs: await response.json(),
         };
         allUsers.push(fullUser);
@@ -198,18 +214,25 @@ function ModalCreateUser(props) {
         <Text id="modal-title" b size={18}>
           Your Name:
         </Text>
-        <Input placeholder="Luc Jonkers" onChange={e => setUserName(e.target.value)} value={userName} />
+        <Input
+          placeholder="Luc Jonkers"
+          onChange={(e) => setUserName(e.target.value)}
+          value={userName}
+        />
         <Text id="modal-title" b size={18}>
           Your Alias/Discord/ENS:
         </Text>
         <Input
           labelLeft="username"
           placeholder="luc.jonkers.eth"
-          onChange={e => setUserAlias(e.target.value)} value={userAlias} />
+          onChange={(e) => setUserAlias(e.target.value)}
+          value={userAlias}
+        />
         <Text id="modal-title" b size={18}>
           Your Profile Picture NFT:
         </Text>
-        <Input type="file"
+        <Input
+          type="file"
           placeholder="https://opensea.io/assets/0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270/28001145"
           onChange={(e) => setUserPicture(e.target.files)}
         />
@@ -219,35 +242,51 @@ function ModalCreateUser(props) {
         <Input
           labelLeft="https://"
           placeholder="www.lucjonkers.com"
-          onChange={e => setUserWebsite(e.target.value)} value={userWebsite}
+          onChange={(e) => setUserWebsite(e.target.value)}
+          value={userWebsite}
         />
         <Text id="modal-title" b size={18}>
           Select your DAO Clearance Level:
         </Text>
         <Radio.Group size={"sm"} color="secondary">
-          <Radio  value="General" onChange={e => {
-          setUserClearance("General");
-          }}>
+          <Radio
+            value="General"
+            onChange={(e) => {
+              setUserClearance("General");
+            }}
+          >
             General
           </Radio>
-          <Radio  value="Bronze" onChange={e => {
-          setUserClearance("Bronze");
-          }}>
+          <Radio
+            value="Bronze"
+            onChange={(e) => {
+              setUserClearance("Bronze");
+            }}
+          >
             Bronze
           </Radio>
-          <Radio value="Silver" onChange={e => {
-          setUserClearance("Silver");
-          }}>
+          <Radio
+            value="Silver"
+            onChange={(e) => {
+              setUserClearance("Silver");
+            }}
+          >
             Silver
           </Radio>
-          <Radio  value="Gold" onChange={e => {
-          setUserClearance("Gold");
-          }}>
+          <Radio
+            value="Gold"
+            onChange={(e) => {
+              setUserClearance("Gold");
+            }}
+          >
             Gold
           </Radio>
-          <Radio  value="God" onChange={e => {
-          setUserClearance("God");
-          }}>
+          <Radio
+            value="God"
+            onChange={(e) => {
+              setUserClearance("God");
+            }}
+          >
             God
           </Radio>
         </Radio.Group>
@@ -258,6 +297,12 @@ function ModalCreateUser(props) {
         </Button>
         <Button auto onClick={upload}>
           Create
+        </Button>
+        <Button auto onClick={getFullUser}>
+          Get User
+        </Button>
+        <Button auto onClick={upload}>
+          Get Users
         </Button>
       </Modal.Footer>
     </Modal>
