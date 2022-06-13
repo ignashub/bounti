@@ -1,122 +1,8 @@
-import React, { useEffect, useState } from "react";
-import { useMoralis } from "react-moralis";
-import { Moralis } from "moralis";
-import { Text, Button, Modal, Input, Radio } from "@nextui-org/react";
+import React from "react";
+import { Text, Button, Modal, Input, Checkbox, Radio } from "@nextui-org/react";
 
 function ModalCreateUser(props) {
-  const [userName, setUserName] = useState("");
-  const [userAlias, setUserAlias] = useState("");
-  const [userPicture, setUserPicture] = useState(null);
-  const [userWebsite, setUserWebsite] = useState("");
-  const [userClearance, setUserClearance] = useState("");
-  const [userOnChainExperience, setUserOnChainExperience] = useState("");
-  const [userOffChainExperience, setUserOffChainExperience] = useState("");
-  const [userCredentials, setUserCredentials] = useState("");
-  const [userAbout, setUserAbout] = useState("");
-
-  const {
-    authenticate,
-    isAuthenticated,
-    isAuthenticating,
-    user,
-    account,
-    logout,
-  } = useMoralis();
-
-  const ethers = Moralis.web3Library;
-
-  //login function Moralis
-  const login = async () => {
-    if (!isAuthenticated) {
-      await authenticate({ signingMessage: "Log in using Moralis" }).catch(
-        function (error) {
-          console.log(error);
-        }
-      );
-    }
-  };
-
-  useEffect(() => {
-    //getAllDAOs();
-  }, []);
-
-  const logOut = async () => {
-    await logout();
-  };
-
-  //   Upload metadata of an User
-  const uploadMetadata = async (imageURL) => {
-    const User = Moralis.Object.extend("Users");
-    const userObject = new User();
-    const userId = user.get("ethAddress");
-    const taskIds = [];
-    const proposalIds = [];
-    const daos = [];
-
-    const metadata = {
-      id: userId,
-      name: userName,
-      alias: userAlias,
-      picture: imageURL,
-      website: userWebsite,
-      clearance: userClearance,
-      taskIds: taskIds,
-      proposalIds: proposalIds,
-      daos: daos,
-      onChainExperience: userOnChainExperience,
-      offChainExperience: userOffChainExperience,
-      credentials: userCredentials,
-      about: userAbout,
-    };
-
-    const file = new Moralis.File("file.json", {
-      base64: btoa(JSON.stringify(metadata)),
-    });
-
-    await file.saveIPFS();
-
-    userObject.set("CID", file.hash());
-    userObject.set("contractAddress", user.get("ethAddress"));
-    console.log(file);
-    await userObject.save();
-  };
-
-  //Upload an image
-  const uploadImage = async () => {
-    const CIDImage = Moralis.Object.extend("CIDImage");
-    const cidimage = new CIDImage();
-
-    const data = userPicture[0];
-    console.log(data);
-    const file = new Moralis.File(data.name, data);
-    await file.saveIPFS();
-
-    cidimage.set("cid", file.hash());
-    await cidimage.save();
-
-    return file.ipfs(); //url where is the image is stored
-  };
-
-  //Function to upload
-  const upload = async () => {
-    const imageInMetadata = await uploadImage(userPicture[0]);
-    await uploadMetadata(imageInMetadata);
-    props.onClose();
-  };
-
-  //Function to get saved info from ipfs
-  const getIpfsUser = async () => {
-    const query = new Moralis.Query("Users");
-    const userContract = user.get("ethAddress");
-    query.equalTo("contractAddress", userContract);
-    const userMoralis = await query.first();
-    const userCID = userMoralis.attributes.CID;
-    const url = `https://gateway.moralisipfs.com/ipfs/${userCID}`;
-    const response = await fetch(url);
-    console.log(url);
-    return response.json();
-  };
-
+  const [selected, setSelected] = React.useState([]);
   return (
     <Modal
       closeButton
@@ -134,134 +20,46 @@ function ModalCreateUser(props) {
       </Modal.Header>
       <Modal.Body>
         <Text id="modal-title" b size={18}>
-          Name:
+          Your Name:
         </Text>
-        <Input
-          placeholder="Luc Jonkers"
-          onChange={(e) => setUserName(e.target.value)}
-          value={userName}
-        />
+        <Input placeholder="Luc Jonkers" />
         <Text id="modal-title" b size={18}>
-          Alias/Discord/ENS:
+          Your Alias/Discord/ENS:
         </Text>
-        <Input
-          labelLeft="username"
-          placeholder="luc.jonkers.eth"
-          onChange={(e) => setUserAlias(e.target.value)}
-          value={userAlias}
-        />
+        <Input labelLeft="username" placeholder="luc.jonkers.eth" />
         <Text id="modal-title" b size={18}>
-          Profile Picture NFT:
+          Your Profile Picture NFT:
         </Text>
-        <Input
-          type="file"
-          placeholder="https://opensea.io/assets/0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270/28001145"
-          onChange={(e) => setUserPicture(e.target.files)}
-        />
+        <Input placeholder="https://opensea.io/assets/0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270/28001145" />
         <Text id="modal-title" b size={18}>
-          Website:
+          Your Website:
         </Text>
-        <Input
-          labelLeft="https://"
-          placeholder="www.lucjonkers.com"
-          onChange={(e) => setUserWebsite(e.target.value)}
-          value={userWebsite}
-        />
+        <Input labelLeft="https://" placeholder="www.lucjonkers.com" />
         <Text id="modal-title" b size={18}>
           Select your DAO Clearance Level:
         </Text>
-        <Radio.Group size={"sm"} color="secondary">
-          <Radio
-            value="General"
-            onChange={(e) => {
-              setUserClearance("General");
-            }}
-          >
-            General
-          </Radio>
-          <Radio
-            value="Bronze"
-            onChange={(e) => {
-              setUserClearance("Bronze");
-            }}
-          >
-            Bronze
-          </Radio>
-          <Radio
-            value="Silver"
-            onChange={(e) => {
-              setUserClearance("Silver");
-            }}
-          >
-            Silver
-          </Radio>
-          <Radio
-            value="Gold"
-            onChange={(e) => {
-              setUserClearance("Gold");
-            }}
-          >
-            Gold
-          </Radio>
-          <Radio
-            value="God"
-            onChange={(e) => {
-              setUserClearance("God");
-            }}
-          >
-            God
-          </Radio>
+        <Radio.Group value="A" size={"sm"} color="secondary">
+          <Radio value="A">General</Radio>
+          <Radio value="B">Bronze</Radio>
+          <Radio value="C">Silver</Radio>
+          <Radio value="D">Gold</Radio>
+          <Radio value="E">God</Radio>
         </Radio.Group>
         <Text id="modal-title" b size={18}>
-          On-Chain Experience:
+          Set a Recovery Password:
         </Text>
-        <Input
-          placeholder="Web3 Consulting: 2016-2018
-
-          Maker DAO: 2018-Present
-          
-          Curve DAO: 2019-Present
-          
-          0x DAO: 2021-Present"
-          onChange={(e) => setUserOnChainExperience(e.target.value)}
-          value={userOnChainExperience}
-        />
-        <Text id="modal-title" b size={18}>
-          Off-Chain Experience:
-        </Text>
-        <Input
-          placeholder="Fontys: 2004-2008
-
-          IT Systems BV: 2008-2009
-          
-          Facebook: 2010-2012
-          
-          IBM: 2012-2016"
-          onChange={(e) => setUserOffChainExperience(e.target.value)}
-          value={userOffChainExperience}
-        />
-        <Text id="modal-title" b size={18}>
-          Credentials:
-        </Text>
-        <Input
-          placeholder="Bachelor's of Software Engineering"
-          onChange={(e) => setUserCredentials(e.target.value)}
-          value={userCredentials}
-        />
-                <Text id="modal-title" b size={18}>
-          About you:
-        </Text>
-        <Input
-          placeholder="Bachelor's of Software Engineering"
-          onChange={(e) => setUserAbout(e.target.value)}
-          value={userAbout}
+        <Input.Password
+          clearable
+          color="warning"
+          initialValue="password"
+          type="password"
         />
       </Modal.Body>
       <Modal.Footer>
         <Button auto flat color="error" onClick={props.onClose}>
           Cancel
         </Button>
-        <Button auto onClick={upload}>
+        <Button auto onClick={props.onClose}>
           Create
         </Button>
       </Modal.Footer>
