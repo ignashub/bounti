@@ -4,7 +4,7 @@ import Stake from "./components/Stake";
 import Profile from "./components/Profile";
 import Dashboard from "./components/Dashboard";
 
-import React, {useState} from "react";
+import React, { useState } from "react";
 import { Routes, Link as ReactLink, Route } from "react-router-dom";
 import {
   Grid,
@@ -18,6 +18,7 @@ import {
 import "./App.css";
 import { useSelector, useDispatch } from "react-redux";
 import { decrement, increment } from "./state/counterSlice";
+import { useMoralis } from "react-moralis";
 
 import {
   ListBulletIcon,
@@ -34,6 +35,27 @@ function App() {
   const method = async () => {
     await dispatch(increment());
     console.log("This is the count value from State Management: ", count);
+  };
+
+  const {
+    authenticate,
+    isAuthenticated,
+    isAuthenticating,
+    user,
+    account,
+    logout,
+  } = useMoralis();
+
+  //login function Moralis
+  const login = async () => {
+    console.log("it works");
+    if (!isAuthenticated) {
+      await authenticate({ signingMessage: "Log in using Moralis" }).catch(
+        function (error) {
+          console.log(error);
+        }
+      );
+    }
   };
 
   return (
@@ -56,7 +78,9 @@ function App() {
                 <Input placeholder="Search" />
               </Grid>
               <Grid>
-                <Button auto onClick={login}>Account</Button>
+                <Button auto onClick={login}>
+                  Account
+                </Button>
               </Grid>
             </Grid.Container>
           </Grid>
