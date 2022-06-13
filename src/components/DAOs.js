@@ -11,6 +11,9 @@ import {
   Modal,
   Avatar,
   Grid,
+  Card,
+  Divider,
+  Link,
 } from "@nextui-org/react";
 import { StyledBadge } from "./StyledBadge";
 import "./Tasks.css";
@@ -18,15 +21,37 @@ import React from "react";
 import ModalCreateDAO from "./common/modalCreateDAO/ModalCreateDAO";
 import ModalAddNewDAO from "./common/modalAddNewDAO/ModalAddNewDAO";
 import ModalDAO from "./common/daoModals/ModalDAO";
+import ModalCreateProposal from "./common/modalProposals/ModalCreateProposal";
+import ModalCreateReading from "./common/modalWeeklyReading/ModalNewWeeklyReading";
+import ModalVoteOnProposal from "./common/modalProposals/ModalVoteOnProposal";
 
-function DAOVotesReading(props) {
+function DAOFunctions(props) {
   const [visible, setVisible] = React.useState(false);
   const [visibleAddDAO, setVisibleAddDAO] = React.useState(false);
   const [visibleAddNewDAO, setVisibleAddNewDAO] = React.useState(false);
   const [visibleDAO, setVisibleDAO] = React.useState(false);
+  const [visibleCreateProposal, setVisibleCreateProposal] =
+    React.useState(false);
+  const [visibleCreateReading, setVisibleCreateReading] = React.useState(false);
+  const [visibleVoteOnProposal, setVisibleVoteOnProposal] =
+    React.useState(false);
+
   function createDAOHandler() {
     setVisibleAddDAO(true);
     console.log("test");
+  }
+
+  function createProposalHandler() {
+    setVisibleCreateProposal(true);
+    console.log("test");
+  }
+
+  function createReadingHandler() {
+    setVisibleCreateReading(true);
+  }
+
+  function createVoteHandler() {
+    setVisibleVoteOnProposal(true);
   }
 
   function onAdd(id) {
@@ -38,6 +63,9 @@ function DAOVotesReading(props) {
     setVisibleAddDAO(false);
     setVisibleAddNewDAO(false);
     setVisibleDAO(false);
+    setVisibleCreateProposal(false);
+    setVisibleCreateReading(false);
+    setVisibleVoteOnProposal(false);
   }
 
   function createNewDAOHandler() {
@@ -305,7 +333,7 @@ function DAOVotesReading(props) {
         {visibleDAO && (
           <ModalDAO id={props.id} open={visibleDAO} onClose={closeModal} />
         )}
-        <Grid.Container justify="right">
+        <Grid.Container justify="right" wrap>
           <Button.Group color="secondary" ghost>
             <Button onClick={createDAOHandler}>Add a DAO</Button>
             <Button onClick={createNewDAOHandler}>Join a DAO</Button>
@@ -325,6 +353,7 @@ function DAOVotesReading(props) {
             )}
           </Button.Group>
         </Grid.Container>
+        <Spacer y={1} />
       </Grid.Container>
       <Modal
         closeButton
@@ -380,6 +409,105 @@ function DAOVotesReading(props) {
           </Button>
         </Modal.Footer>
       </Modal>
+      <Row css={{ paddingBottom: 16 }} gap={1}>
+        <Container>
+          <Col span={6}>
+            <Grid>
+              <Card>
+                <Card.Header>
+                  <Text
+                    b
+                    h3
+                    css={{
+                      textGradient: "45deg, $purple600 -20%, $pink600 100%",
+                    }}
+                  >
+                    DAO Name
+                  </Text>
+                </Card.Header>
+                <Divider />
+                <Card.Body css={{ py: "$10" }}>
+                  <Text id="modal-title" b size={16}>
+                    DAO Description:
+                  </Text>
+                  <Text>
+                    Curve is an exchange liquidity pool on Ethereum (like
+                    Uniswap) designed for (1) extremely efficient stablecoin
+                    trading (2) low risk, supplemental fee income for liquidity
+                    providers, without an opportunity cost.
+                  </Text>
+                  <Text id="modal-title" b size={16}>
+                    DAO Technology:
+                  </Text>
+                  <Text>Ethereum</Text>
+                  <Text id="modal-title" b size={16}>
+                    DAO Contract Address:
+                  </Text>
+                  <Text>0xD533a949740bb3306d119CC777fa900bA034cd52</Text>
+                  <Text id="modal-title" b size={16}>
+                    Offical Site:
+                  </Text>
+                  <Link
+                    icon
+                    color="primary"
+                    target="_blank"
+                    href="https://curve.fi/"
+                  >
+                    curve.fi
+                  </Link>
+                  <Text id="modal-title" b size={16}>
+                    DAO Sections:
+                  </Text>
+                  <Text>
+                    Treasury, Governance, Development, DeFi, Advertising and
+                    Social Media
+                  </Text>
+                </Card.Body>
+                <Divider />
+                <Card.Footer>
+                  <Row justify="flex-end">
+                    <Button
+                      onClick={createVoteHandler}
+                      color="secondary"
+                      size="sm"
+                    >
+                      Show More
+                    </Button>
+                    {visibleVoteOnProposal && (
+                      <ModalVoteOnProposal
+                        id={props.id}
+                        open={visibleVoteOnProposal}
+                        onClose={closeModal}
+                      />
+                    )}
+                  </Row>
+                </Card.Footer>
+              </Card>
+            </Grid>
+          </Col>
+        </Container>
+      </Row>
+      <Spacer y={1} />
+      <Grid.Container justify="right" wrap>
+        <Button.Group color="secondary" ghost>
+          <Button onClick={createProposalHandler}>Create a Proposal</Button>
+          <Button onClick={createReadingHandler}>Create new Reading</Button>
+          {visibleCreateProposal && (
+            <ModalCreateProposal
+              id={props.id}
+              open={visibleCreateProposal}
+              onClose={closeModal}
+            />
+          )}
+          {visibleCreateReading && (
+            <ModalCreateReading
+              id={props.id}
+              open={visibleCreateReading}
+              onClose={closeModal}
+            />
+          )}
+        </Button.Group>
+      </Grid.Container>
       <Row css={{ paddingBottom: 16 }} gap={1}>
         <Col span={6}>
           <Row>
@@ -463,6 +591,7 @@ function DAOVotesReading(props) {
           </Table>
         </Col>
       </Row>
+      <Spacer y={1} />
       <Row css={{ paddingBottom: 16 }} gap={1}>
         <Col span={12}>
           <Row>
@@ -509,4 +638,4 @@ function DAOVotesReading(props) {
     </Container>
   );
 }
-export default DAOVotesReading;
+export default DAOFunctions;

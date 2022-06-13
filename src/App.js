@@ -1,40 +1,44 @@
-import Tasks from "./components/Tasks";
-import DAOs from "./components/DAOs";
-import Stake from "./components/Stake";
-import Dashboard from "./components/Dashboard";
-
-import React from "react";
-import { Routes, Link as ReactLink, Route } from "react-router-dom";
-import {
-  Grid,
-  Card,
-  Input,
-  Button,
-  Text,
-  Spacer,
-  Link,
-} from "@nextui-org/react";
-import "./App.css";
-// There we get everything for StateManagement
-import { useSelector, useDispatch } from 'react-redux';
-import { decrement, increment } from './state/counterSlice';
+import { useSelector, useDispatch } from "react-redux";
+import { decrement, increment } from "./state/counterSlice";
+import { useMoralis } from "react-moralis";
 
 import {
   ListBulletIcon,
   DashboardIcon,
   LayersIcon,
-  AngleIcon,
+  PersonIcon,
 } from "@radix-ui/react-icons";
 
 function App() {
   // this is done only for testing purposes for State Management
-  const count = useSelector((state) => state.counter.value)
-  const dispatch = useDispatch()
+  const count = useSelector((state) => state.counter.value);
+  const dispatch = useDispatch();
 
-  const method = async() => {
+  const method = async () => {
     await dispatch(increment());
     console.log("This is the count value from State Management: ", count);
-  }
+  };
+
+  const {
+    authenticate,
+    isAuthenticated,
+    isAuthenticating,
+    user,
+    account,
+    logout,
+  } = useMoralis();
+
+  //login function Moralis
+  const login = async () => {
+    console.log("it works");
+    if (!isAuthenticated) {
+      await authenticate({ signingMessage: "Log in using Moralis" }).catch(
+        function (error) {
+          console.log(error);
+        }
+      );
+    }
+  };
 
   return (
     <Grid.Container className="container">
@@ -56,7 +60,9 @@ function App() {
                 <Input placeholder="Search" />
               </Grid>
               <Grid>
-                <Button>Account</Button>
+                <Button auto onClick={login}>
+                  Account
+                </Button>
               </Grid>
             </Grid.Container>
           </Grid>
@@ -100,9 +106,9 @@ function App() {
 
           <Text color css={{ color: "white" }}>
             <li>
-              <ReactLink to="Stake">
-                <AngleIcon />
-                Stake
+              <ReactLink to="Profile">
+                <PersonIcon />
+                Profile
                 <Spacer y={2} />
               </ReactLink>
             </li>
@@ -116,7 +122,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/tasks" element={<Tasks />} />
-            <Route path="/stake" element={<Stake />} />
+            <Route path="/profile" element={<Profile />} />
             <Route path="/daos" element={<DAOs />} />
           </Routes>
         </Card>
