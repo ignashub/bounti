@@ -29,8 +29,8 @@ const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <BrowserRouter>
     <MoralisProvider
-      serverUrl="https://utlzlevmrm3r.usemoralis.com:2053/server"
-      appId="nw56yLQNMqzIeFkUwTdimmRbKJqg6TkzR5lNUEje"
+      serverUrl="https://o7cjkn7ahuu6.usemoralis.com:2053/server"
+      appId="xZWRsxSMCWqUvH0m6BKtgco6ZMWr1fFE7HkPA8cd"
     >
       <NextUIProvider theme={theme}>
         <Provider store={store}>
