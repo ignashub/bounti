@@ -1,8 +1,15 @@
 import React from "react";
-import { Text, Button, Modal, Input, Checkbox, Radio } from "@nextui-org/react";
+import {
+  Text,
+  Button,
+  Modal,
+  Input,
+  Checkbox,
+  Radio,
+  Textarea,
+} from "@nextui-org/react";
 
-
-function ModalAddNewDAO(props) {
+function ModalCreateTask(props) {
   const [selected, setSelected] = React.useState([]);
   return (
     <Modal
@@ -16,24 +23,28 @@ function ModalAddNewDAO(props) {
     >
       <Modal.Header>
         <Text id="modal-title" b size={18}>
-          Join a DAO:
+          Create a Task:
         </Text>
       </Modal.Header>
       <Modal.Body>
         <Text id="modal-title" b size={18}>
-          DAO's Name:
+          Task's Name:
         </Text>
-        <Input placeholder="Curve DAO" id="DAOname"/>
+        <Input placeholder="Develop Notification services for MakerDAOs dApp" />
         <Text id="modal-title" b size={18}>
           DAO's Tag:
         </Text>
-        <Input placeholder="CRV-DAO" id="DAOtag"/>
+        <Input placeholder="CRV-DAO" />
         <Text id="modal-title" b size={18}>
-          Proof of Membership:
+          Description:
         </Text>
-        <Input placeholder="Contract Address...." id="DAOcontract"/>
+        <Textarea placeholder="The follwoing task requires the workers to further develop the Push Notification services for the MakerDAO dApp." />
         <Text id="modal-title" b size={18}>
-          Select the DAO Sections you participate in:
+          Owner:
+        </Text>
+        <Input placeholder="luc.jonkers.eth" />
+        <Text id="modal-title" b size={18}>
+          Select the DAO Section that best Relates to the Task:
         </Text>
         <Checkbox.Group
           color="secondary"
@@ -41,7 +52,6 @@ function ModalAddNewDAO(props) {
           value={selected}
           onChange={setSelected}
           size={"sm"}
-          id="DAOsections"
         >
           <Checkbox value="General">General</Checkbox>
           <Checkbox value="DeFi">DeFi</Checkbox>
@@ -50,9 +60,11 @@ function ModalAddNewDAO(props) {
           <Checkbox value="Governance">Governance</Checkbox>
           <Checkbox value="Growth">Growth</Checkbox>
         </Checkbox.Group>
-        <Text>Your Available Sections will be: {selected.join(", ")}</Text>
+        <Text>
+          This Task will be Available in Sections: {selected.join(", ")}
+        </Text>
         <Text id="modal-title" b size={18}>
-          Select your DAO Clearance Level:
+          Select the Task Clearance Level:
         </Text>
         <Radio.Group value="A" size={"sm"} color="secondary">
           <Radio value="A">General</Radio>
@@ -61,17 +73,21 @@ function ModalAddNewDAO(props) {
           <Radio value="D">Gold</Radio>
           <Radio value="E">God</Radio>
         </Radio.Group>
+        <Text id="modal-title" b size={18}>
+          Reward:
+        </Text>
+        <Input placeholder="5000 BTI" />
       </Modal.Body>
       <Modal.Footer>
         <Button auto flat color="error" onClick={props.onClose}>
           Cancel
         </Button>
         <Button auto onClick={props.onClose}>
-          Join DAO
+          Create Task
         </Button>
       </Modal.Footer>
     </Modal>
   );
 }
 
-export default ModalAddNewDAO;
+export default ModalCreateTask;
