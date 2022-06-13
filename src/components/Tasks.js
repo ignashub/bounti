@@ -14,33 +14,9 @@ import {
 import { StyledBadge } from "./StyledBadge";
 import "./Tasks.css";
 import React from "react";
-import ModalCreateTask from "./common/modalTasks/ModalCreateTask";
-import ModalTask from "./common/modalTasks/ModalTask";
-import ModalReviewTask from "./common/modalTasks/ModalReviewTask";
 
 function Tasks(props) {
   const [visible, setVisible] = React.useState(false);
-  const [visibleCreateTask, setVisibleCreateTask] = React.useState(false);
-  const [visibleTask, setVisibleTask] = React.useState(false);
-  const [visibleReviewTask, setVisibleReviewTask] = React.useState(false);
-
-  function createTaskHandler() {
-    setVisibleCreateTask(true);
-  }
-
-  function viewTaskHandler() {
-    setVisibleTask(true);
-  }
-
-  function closeModal() {
-    setVisibleTask(false);
-    setVisibleCreateTask(false);
-    setVisibleReviewTask(false);
-  }
-
-  function createReviewTaskHandler() {
-    setVisibleReviewTask(true);
-  }
 
   const handler = () => setVisible(true);
   const closeHandler = () => {
@@ -210,16 +186,9 @@ function Tasks(props) {
                 color="error"
                 onClick={() => console.log("Open more info", task.id)}
               >
-                <Button size="sm" color="secondary" onClick={viewTaskHandler}>
+                <Button size="sm" color="secondary" onClick={handler}>
                   More Info
                 </Button>
-                {visibleTask && (
-                  <ModalTask
-                    id={props.id}
-                    open={visibleTask}
-                    onClose={closeModal}
-                  />
-                )}
               </Tooltip>
             </Col>
           </Row>
@@ -231,25 +200,64 @@ function Tasks(props) {
   return (
     <Container gap={0}>
       <Grid.Container justify="right">
-        <Button.Group color="secondary" ghost>
-          <Button onClick={createTaskHandler}>Create a Task</Button>
-          <Button onClick={createReviewTaskHandler}>Review a Task</Button>
-          {visibleCreateTask && (
-            <ModalCreateTask
-              id={props.id}
-              open={visibleCreateTask}
-              onClose={closeModal}
-            />
-          )}
-          {visibleReviewTask && (
-            <ModalReviewTask
-              id={props.id}
-              open={visibleReviewTask}
-              onClose={closeModal}
-            />
-          )}
-        </Button.Group>
+        <Button color="secondary" ghost>
+          Create a Task
+        </Button>
       </Grid.Container>
+      <Modal
+        closeButton
+        aria-labelledby="modal-title"
+        open={visible}
+        onClose={closeHandler}
+        blur
+      >
+        <Modal.Header>
+          <Text id="modal-title" b size={18}>
+            Develop Notification services for MakerDAOs dApp
+          </Text>
+        </Modal.Header>
+        <Modal.Body>
+          <Text id="modal-title" b size={18}>
+            Description:
+            <Text>
+              The follwoing task requires the workers to further develop the
+              Push Notification services for the MakerDAO dApp.
+            </Text>
+          </Text>
+          <Text id="modal-title" b size={18}>
+            Details:
+            <Text>Using EPNS, React, Sol, etc...</Text>
+          </Text>
+          <Text id="modal-title" b size={18}>
+            Owner:
+            <Text>johnster.eth</Text>
+          </Text>
+          <Text id="modal-title" b size={18}>
+            Workers:
+            <Text>crazyziu.eth, rx73.eth, hazza.eth</Text>
+          </Text>
+          <Text id="modal-title" b size={18}>
+            Reviewers:
+            <Text>Pending...</Text>
+          </Text>
+          <Text id="modal-title" b size={18}>
+            Status:
+            <Text>Waiting for Review...</Text>
+          </Text>
+          <Text id="modal-title" b size={18}>
+            Reward:
+            <Text>250 CRV & 50 BTI</Text>
+          </Text>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button auto flat color="error" onClick={closeHandler}>
+            Close
+          </Button>
+          <Button auto onClick={closeHandler}>
+            Sign in
+          </Button>
+        </Modal.Footer>
+      </Modal>
       <Row css={{ paddingBottom: 16 }} gap={1}>
         <Col span={6}>
           <Row>
