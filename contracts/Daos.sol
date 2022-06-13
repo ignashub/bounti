@@ -118,7 +118,6 @@ contract Daos {
     }
 }
 
-//SPDX-License-Identifier: MIT
 // pragma solidity ^0.8.0;
 // // NOTE: Deploy this contract first
 // contract B {
