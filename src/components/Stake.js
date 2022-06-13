@@ -25,7 +25,7 @@ function Stake(props) {
         Create a Task
       </Button>
       {visible && (
-        <ModalCreateUser id={props.id} open={visible} onClose={closeModal} connectedUser={props.connectedUser} />
+        <ModalCreateUser id={props.id} open={visible} onClose={closeModal} />
       )}
     </div>
   );
