@@ -1,55 +1,70 @@
-# BOUNTI dApp x Byont Labs
+# Getting Started with Create React App
 
-### The following README further outlines the Bounti Project created by an OPEN FHICT Team consisting of (Luc Jonkers, Vitali Bestolkau, Dante Geroge, Furkan Öztürk, Ignas Apšega)
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Available Scripts
 
-Bounti is a fully decentralised on-chain dApp created with the intention of providing DAO users with a modern solution to manage the communication and coordination between themselves and one or more DAOs on the daily basis. Bounti does this by allowing users to interact with Tasks, Votes and Proposals created by the DAOs they are a member of. Therefore each user has complete control and oversight of their daily expectations, daily work and daily participation without the stress and clutter of other industry standards such as Discord or Telegram.
+In the project directory, you can run:
 
-## Functionalities
+### `npm start`
 
-1. Web3 connection via Metamask Wallet
-2. Create a DAO inside Bounti
-3. Add an already existing DAO inside Bounti
-4. View added DAOs
-5. Create a Task related to a specific DAO
-6. View Tasks
-7. Review a Task
-8. Create a Vote/Proposal
-9. Vote on a Vote/Proposal
-10. Create a Weekly Reading
-11. Create a user profile
+Runs the app in the development mode.\
+Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
+The page will reload when you make changes.\
+You may also see any lint errors in the console.
 
-## Technologies
+### `npm test`
 
-1. Avalanche Blockchain - via Moralis SDK stores Users' Names and addresses.
-2. Moralis SDK - used to store CIDs in the Moralis database. Also, used to store Users' JSONs to the IPFS.
-3. React/React Bootstrap for the front-end.
-4. NextUI React UI library
+Launches the test runner in the interactive watch mode.\
+See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
+### `npm run build`
 
-## Prerequisites
-1. Latest Node.Js long time service (LTS) version.
-2. Metamaks plugin connected to your browser and have an
-Avalanche FUJI C-Chain as a network option in your Metamask Wallet. 
-You can use this website: https://umbria.network/connect/avalanche-fuji-testnet 
-or follow this video: https://www.youtube.com/watch?v=8PkQXeh-U-c&ab_channel=EMDX 
-to set the FUJI test network in your Metamask.
-3. Credits on FUJI test network are needed for transactions. As this is a test network, you won’t need to spend real money on
-that, you can easily claim your 10 AVAX coins for the testnet on this website - https://faucets.chain.link/fuji
+Builds the app for production to the `build` folder.\
+It correctly bundles React in production mode and optimizes the build for the best performance.
 
+The build is minified and the filenames include the hashes.\
+Your app is ready to be deployed!
 
-## Documentation
+See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-The full documentation for this project fully outlining the code both frontend and backend can be found at the following link:
-[Bounti Documentation](https://docs.google.com/document/d/1asJG7DCwxHCSHNpulH3iwnG2YJIdKn0weVSz1izFNrY/edit?usp=sharing).
+### `npm run eject`
 
+**Note: this is a one-way operation. Once you `eject`, you can't go back!**
 
-## How to start
+If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
 
-Type this code in the terminal step by step:
-1. `git clone ` + link to this repository - to get this project on your computer.
-2. `npm install` - to install dependencies for the project.
-3. `npm start` - to start the project.
+Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
 
-## Thank you for using Bounti
+You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+
+## Learn More
+
+You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+
+To learn React, check out the [React documentation](https://reactjs.org/).
+
+### Code Splitting
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+
+### Analyzing the Bundle Size
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+
+### Making a Progressive Web App
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+
+### Advanced Configuration
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+
+### Deployment
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+
+### `npm run build` fails to minify
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
