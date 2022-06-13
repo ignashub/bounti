@@ -4,7 +4,7 @@ import Stake from "./components/Stake";
 import Profile from "./components/Profile";
 import Dashboard from "./components/Dashboard";
 
-import React from "react";
+import React, {useState} from "react";
 import { Routes, Link as ReactLink, Route } from "react-router-dom";
 import {
   Grid,
@@ -56,7 +56,7 @@ function App() {
                 <Input placeholder="Search" />
               </Grid>
               <Grid>
-                <Button>Account</Button>
+                <Button auto onClick={login}>Account</Button>
               </Grid>
             </Grid.Container>
           </Grid>
