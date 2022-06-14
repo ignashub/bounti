@@ -166,6 +166,18 @@ function Tasks(props) {
     },
   ];
 
+
+
+
+
+
+
+
+
+
+
+
+
   const renderCell = (task, columnKey) => {
     const cellValue = task[columnKey];
     switch (columnKey) {
