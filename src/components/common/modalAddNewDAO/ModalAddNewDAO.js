@@ -1,9 +1,34 @@
 import React from "react";
 import { Text, Button, Modal, Input, Checkbox, Radio } from "@nextui-org/react";
+import {Moralis} from "moralis";
+import abi from "../../../utils/Daos.json";
 
 
 function ModalAddNewDAO(props) {
   const [selected, setSelected] = React.useState([]);
+
+  const ethers = Moralis.web3Library;
+
+  //variables for smart contract
+  const contractAddress = "0x8a7a1605A9a3a6aFB81f7237325D3b3aead2004e";
+  const contractABI = abi.abi;
+
+  // joining a dao
+  const JoinDAO = async () => {
+    const { ethereum } = window;
+    const provider = new ethers.providers.Web3Provider(ethereum);
+    const signer = provider.getSigner();
+    const bountiContract = new ethers.Contract(contractAddress, contractABI, signer);
+    const daoContract = document.getElementById("DAOcontract").value;
+
+    await bountiContract.joinDao(daoContract);
+  }
+
+  const join = async () => {
+    await JoinDAO();
+    props.onClose();
+  }
+
   return (
     <Modal
       closeButton

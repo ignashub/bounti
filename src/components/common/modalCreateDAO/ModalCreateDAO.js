@@ -4,7 +4,7 @@ import { Text, Button, Modal, Input, Textarea } from "@nextui-org/react";
 import React, { useEffect, useState} from "react";
 import { useMoralis } from "react-moralis";
 import { Moralis } from "moralis";
-import abi from "../../../utils/Bounti.json";
+import abi from "../../../utils/Daos.json";
 // import BTI from "./Bounti-backend.js";
 
 
@@ -17,7 +17,7 @@ function ModalCreate(props) {
       account,
       logout,
     } = useMoralis();
-  
+
     const ethers = Moralis.web3Library;
   
     //const [image, setImage] = useState(null);
@@ -79,6 +79,7 @@ function ModalCreate(props) {
   
       dao.set("CID", file.hash());
       dao.set("contractAddress", contract);
+      dao.set("daoTag", tag);
       await dao.save();
     };
   
@@ -173,17 +174,6 @@ function ModalCreate(props) {
         const daoContract = document.getElementById("DAOcontract").value;
         console.log(daoContract)
         await bountiContract.addDao(daoContract);
-      }
-  
-      // joining a dao
-      const JoinDAO = async () => {
-        const { ethereum } = window;
-        const provider = new ethers.providers.Web3Provider(ethereum);
-        const signer = provider.getSigner();
-        const bountiContract = new ethers.Contract(contractAddress, contractABI, signer);
-        const daoContract = document.getElementById("DAOcontract").value;
-    
-        await bountiContract.joinDao(daoContract);
       }
 
   return (
