@@ -1,11 +1,24 @@
-import React from "react";
+import React, {useState} from "react";
 import { Text, Button, Modal, Input, Checkbox, Radio } from "@nextui-org/react";
 import {Moralis} from "moralis";
 import abi from "../../../utils/Daos.json";
+import {useMoralis} from "react-moralis";
+import {getIpfsUser, updateUser} from "../generalFunctions/user";
 
 
 function ModalAddNewDAO(props) {
-  const [selected, setSelected] = React.useState([]);
+
+  const {
+    authenticate,
+    isAuthenticated,
+    isAuthenticating,
+    user,
+    // account,
+    logout,
+  } = useMoralis();
+
+  const [selected, setSelected] = useState([]);
+  const [daoTag, setDaoTag] = useState("");
 
   const ethers = Moralis.web3Library;
 
@@ -14,18 +27,37 @@ function ModalAddNewDAO(props) {
   const contractABI = abi.abi;
 
   // joining a dao
-  const JoinDAO = async () => {
+  const JoinDAO = async (daoContract) => {
     const { ethereum } = window;
     const provider = new ethers.providers.Web3Provider(ethereum);
     const signer = provider.getSigner();
     const bountiContract = new ethers.Contract(contractAddress, contractABI, signer);
-    const daoContract = document.getElementById("DAOcontract").value;
 
     await bountiContract.joinDao(daoContract);
   }
 
+  const update = async (daoContract) => {
+    const address = user.get("ethAddress");
+
+    const userObject = await getIpfsUser(address);
+    userObject.daos.push(daoContract);
+    await updateUser(userObject, address);
+  }
+
+
+
+  const getDaoAddress = async () => {
+    const query = new Moralis.Query("DAOs");
+    query.equalTo("daoTag", daoTag);
+    const dao = await query.first();
+    console.log("Thats the DAO contract that I get: ", dao.attributes.contractAddress)
+    return dao.attributes.contractAddress;
+  }
+
   const join = async () => {
-    await JoinDAO();
+    const daoContract = await getDaoAddress();
+    await JoinDAO(daoContract);
+    await update(daoContract);
     props.onClose();
   }
 
@@ -52,7 +84,8 @@ function ModalAddNewDAO(props) {
         <Text id="modal-title" b size={18}>
           DAO's Tag:
         </Text>
-        <Input placeholder="CRV-DAO" id="DAOtag"/>
+        <Input placeholder="CRV-DAO" id="DAOtag"
+               onChange={e => setDaoTag(e.target.value.trim())}/>
         <Text id="modal-title" b size={18}>
           Proof of Membership:
         </Text>
@@ -91,7 +124,7 @@ function ModalAddNewDAO(props) {
         <Button auto flat color="error" onClick={props.onClose}>
           Cancel
         </Button>
-        <Button auto onClick={props.onClose}>
+        <Button auto onClick={join}>
           Join DAO
         </Button>
       </Modal.Footer>

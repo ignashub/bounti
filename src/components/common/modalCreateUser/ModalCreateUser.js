@@ -76,7 +76,7 @@ function ModalCreateUser(props) {
     await file.saveIPFS();
 
     userObject.set("CID", file.hash());
-    userObject.set("contractAddress", user.get("ethAddress"));
+    userObject.set("walletAddress", user.get("ethAddress"));
     console.log(file);
     await userObject.save();
   };
@@ -102,19 +102,6 @@ function ModalCreateUser(props) {
     const imageInMetadata = await uploadImage(userPicture[0]);
     await uploadMetadata(imageInMetadata);
     props.onClose();
-  };
-
-  //Function to get saved info from ipfs
-  const getIpfsUser = async () => {
-    const query = new Moralis.Query("Users");
-    const userContract = user.get("ethAddress");
-    query.equalTo("contractAddress", userContract);
-    const userMoralis = await query.first();
-    const userCID = userMoralis.attributes.CID;
-    const url = `https://gateway.moralisipfs.com/ipfs/${userCID}`;
-    const response = await fetch(url);
-    console.log(url);
-    return response.json();
   };
 
   return (
