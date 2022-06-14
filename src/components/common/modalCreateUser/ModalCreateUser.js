@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useMoralis } from "react-moralis";
 import { Moralis } from "moralis";
 import { Text, Button, Modal, Input, Radio } from "@nextui-org/react";
+import abi from "../../../utils/Users.json";
 
 function ModalCreateUser(props) {
   const [userName, setUserName] = useState("");
@@ -9,10 +10,8 @@ function ModalCreateUser(props) {
   const [userPicture, setUserPicture] = useState(null);
   const [userWebsite, setUserWebsite] = useState("");
   const [userClearance, setUserClearance] = useState("");
-  const [userOnChainExperience, setUserOnChainExperience] = useState("");
-  const [userOffChainExperience, setUserOffChainExperience] = useState("");
-  const [userCredentials, setUserCredentials] = useState("");
-  const [userAbout, setUserAbout] = useState("");
+  const [createUser, setcreateUser] = useState(null);
+  const [allcreateUsers, setcreateUsers] = useState([]);
 
   const {
     authenticate,
@@ -24,6 +23,10 @@ function ModalCreateUser(props) {
   } = useMoralis();
 
   const ethers = Moralis.web3Library;
+
+  //variables for smart contract
+  const contractAddress = "0xF4A3dc8e7E2dc1f0CB000aDBe2C13f7CF5632811";
+  const contractABI = abi.abi;
 
   //login function Moralis
   const login = async () => {
@@ -48,25 +51,17 @@ function ModalCreateUser(props) {
   const uploadMetadata = async (imageURL) => {
     const User = Moralis.Object.extend("Users");
     const userObject = new User();
-    const userId = user.get("ethAddress");
-    const taskIds = [];
-    const proposalIds = [];
-    const daos = [];
+    const tasksIds = [];
+    const proposalsIds = [];
 
     const metadata = {
-      id: userId,
       name: userName,
       alias: userAlias,
       picture: imageURL,
       website: userWebsite,
       clearance: userClearance,
-      taskIds: taskIds,
-      proposalIds: proposalIds,
-      daos: daos,
-      onChainExperience: userOnChainExperience,
-      offChainExperience: userOffChainExperience,
-      credentials: userCredentials,
-      about: userAbout,
+      tasksIds: tasksIds,
+      proposalsIds: proposalsIds,
     };
 
     const file = new Moralis.File("file.json", {
@@ -79,6 +74,21 @@ function ModalCreateUser(props) {
     userObject.set("contractAddress", user.get("ethAddress"));
     console.log(file);
     await userObject.save();
+  };
+
+  //adding user to blockchain
+  const addUser = async () => {
+    const { ethereum } = window;
+    const provider = new ethers.providers.Web3Provider(ethereum);
+    const signer = provider.getSigner();
+    const userContract = new ethers.Contract(
+      contractAddress,
+      contractABI,
+      signer
+    );
+    const userAddress = user.get("ethAddress");
+    console.log(userAddress);
+    // await userContract.addUser();
   };
 
   //Upload an image
@@ -101,6 +111,7 @@ function ModalCreateUser(props) {
   const upload = async () => {
     const imageInMetadata = await uploadImage(userPicture[0]);
     await uploadMetadata(imageInMetadata);
+    await addUser();
     props.onClose();
   };
 
@@ -113,8 +124,75 @@ function ModalCreateUser(props) {
     const userCID = userMoralis.attributes.CID;
     const url = `https://gateway.moralisipfs.com/ipfs/${userCID}`;
     const response = await fetch(url);
-    console.log(url);
     return response.json();
+  };
+
+  //get single user from the blockchain
+  const getUser = async () => {
+    const userAddress = user.get("ethAddress");
+    const { ethereum } = window;
+    if (ethereum) {
+      const provider = new ethers.providers.Web3Provider(ethereum);
+      const signer = provider.getSigner();
+      const userContract = new ethers.Contract(
+        contractAddress,
+        contractABI,
+        signer
+      );
+      const userBlockchain = await userContract.getUser(userAddress);
+      return userBlockchain;
+    }
+  };
+
+  // IPFS+AVAX get in one function, putting values together in one variable
+  const getFullUser = async () => {
+    const user = await getUser();
+    const ipfs = await getIpfsUser();
+
+    const fullUser = {
+      user: user,
+      ipfs: ipfs,
+    };
+    setcreateUser(fullUser);
+    console.log(fullUser);
+  };
+
+  //getting all users from the blockchain
+  //Addition; contract addresses need to be in correct format or else there will be a miss communication between avax and moralis
+  const getAllUsers = async () => {
+    const allUsers = [];
+    const { ethereum } = window;
+    if (ethereum) {
+      const provider = new ethers.providers.Web3Provider(ethereum);
+      const signer = provider.getSigner();
+      const userContract = new ethers.Contract(
+        contractAddress,
+        contractABI,
+        signer
+      );
+      const uc = await userContract.getAllUsers();
+      for (const user of uc) {
+        const query = new Moralis.Query("Users");
+        console.log(user);
+        console.log(user.contractAddress);
+        await query
+          .select("CID")
+          .equalTo("contractAddress", user.contractAddress);
+        const qAnswer = await query.first();
+        console.log(qAnswer);
+        const userCID = qAnswer.attributes.CID;
+        const url = `https://gateway.moralisipfs.com/ipfs/${userCID}`;
+        const response = await fetch(url);
+        console.log(response);
+        const fullUser = {
+          uc: user,
+          ipfs: await response.json(),
+        };
+        allUsers.push(fullUser);
+        console.log(fullUser);
+      }
+      setcreateUsers(allUsers);
+    }
   };
 
   return (
@@ -134,7 +212,7 @@ function ModalCreateUser(props) {
       </Modal.Header>
       <Modal.Body>
         <Text id="modal-title" b size={18}>
-          Name:
+          Your Name:
         </Text>
         <Input
           placeholder="Luc Jonkers"
@@ -142,7 +220,7 @@ function ModalCreateUser(props) {
           value={userName}
         />
         <Text id="modal-title" b size={18}>
-          Alias/Discord/ENS:
+          Your Alias/Discord/ENS:
         </Text>
         <Input
           labelLeft="username"
@@ -151,7 +229,7 @@ function ModalCreateUser(props) {
           value={userAlias}
         />
         <Text id="modal-title" b size={18}>
-          Profile Picture NFT:
+          Your Profile Picture NFT:
         </Text>
         <Input
           type="file"
@@ -159,7 +237,7 @@ function ModalCreateUser(props) {
           onChange={(e) => setUserPicture(e.target.files)}
         />
         <Text id="modal-title" b size={18}>
-          Website:
+          Your Website:
         </Text>
         <Input
           labelLeft="https://"
@@ -212,50 +290,6 @@ function ModalCreateUser(props) {
             God
           </Radio>
         </Radio.Group>
-        <Text id="modal-title" b size={18}>
-          On-Chain Experience:
-        </Text>
-        <Input
-          placeholder="Web3 Consulting: 2016-2018
-
-          Maker DAO: 2018-Present
-          
-          Curve DAO: 2019-Present
-          
-          0x DAO: 2021-Present"
-          onChange={(e) => setUserOnChainExperience(e.target.value)}
-          value={userOnChainExperience}
-        />
-        <Text id="modal-title" b size={18}>
-          Off-Chain Experience:
-        </Text>
-        <Input
-          placeholder="Fontys: 2004-2008
-
-          IT Systems BV: 2008-2009
-          
-          Facebook: 2010-2012
-          
-          IBM: 2012-2016"
-          onChange={(e) => setUserOffChainExperience(e.target.value)}
-          value={userOffChainExperience}
-        />
-        <Text id="modal-title" b size={18}>
-          Credentials:
-        </Text>
-        <Input
-          placeholder="Bachelor's of Software Engineering"
-          onChange={(e) => setUserCredentials(e.target.value)}
-          value={userCredentials}
-        />
-                <Text id="modal-title" b size={18}>
-          About you:
-        </Text>
-        <Input
-          placeholder="Bachelor's of Software Engineering"
-          onChange={(e) => setUserAbout(e.target.value)}
-          value={userAbout}
-        />
       </Modal.Body>
       <Modal.Footer>
         <Button auto flat color="error" onClick={props.onClose}>
@@ -263,6 +297,12 @@ function ModalCreateUser(props) {
         </Button>
         <Button auto onClick={upload}>
           Create
+        </Button>
+        <Button auto onClick={getFullUser}>
+          Get User
+        </Button>
+        <Button auto onClick={upload}>
+          Get Users
         </Button>
       </Modal.Footer>
     </Modal>
