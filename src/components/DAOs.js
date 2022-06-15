@@ -14,6 +14,7 @@ import {
   Card,
   Divider,
   Link,
+  Radio,
 } from "@nextui-org/react";
 import { StyledBadge } from "./StyledBadge";
 import "./Tasks.css";
@@ -25,7 +26,6 @@ import ModalCreateProposal from "./common/modalProposals/ModalCreateProposal";
 import ModalCreateReading from "./common/modalWeeklyReading/ModalNewWeeklyReading";
 import ModalVoteOnProposal from "./common/modalProposals/ModalVoteOnProposal";
 import {getContract} from "./common/generalFunctions/daos";
-
 import { useMoralis } from "react-moralis";
 import { Moralis } from "moralis";
 import abi from "../utils/Daos.json";
@@ -57,6 +57,9 @@ function DAOFunctions(props) {
   const [daoContract, setDaoContract] = useState("");
   const [daoSections, setDaoSections] = useState("");
   const [daoSite, setDaoSite] = useState("");
+
+  //states for Proposals
+  const [userVote, setUserVote] = useState(false);
 
 
   function createDAOHandler() {
@@ -501,6 +504,27 @@ function DAOFunctions(props) {
             Acceptance Threshold:
             <Text>Atleast 50% of DAO members have to vote for</Text>
           </Text>
+          <Text id="modal-title" b size={18}>
+            Vote:
+          </Text>
+          <Radio.Group size={"sm"} color="secondary">
+          <Radio
+            value="General"
+            onChange={(e) => {
+              setUserVote(true);
+            }}
+          >
+            Voter for
+          </Radio>
+          <Radio
+            value="Bronze"
+            onChange={(e) => {
+              setUserVote(false);
+            }}
+          >
+            Vote against
+          </Radio>
+        </Radio.Group>
         </Modal.Body>
         <Modal.Footer>
           <Button auto flat color="error" onClick={closeHandler}>

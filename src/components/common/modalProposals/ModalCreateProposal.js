@@ -96,17 +96,32 @@ function ModalCreateProposal(props) {
   };
 
   //Function to get saved info from ipfs
-  const getIpfsProposal = async () => {
-    const query = new Moralis.Query("Proposals");
-    const userWalletAddress = user.get("ethAddress");
-    query.equalTo("userWalletAddress", userWalletAddress);
-    const userMoralis = await query.first();
-    const proposalCID = userMoralis.attributes.CID;
-    const url = `https://gateway.moralisipfs.com/ipfs/${proposalCID}`;
-    const response = await fetch(url);
-    console.log(url);
-    return response.json();
-  };
+  // const getIpfsProposal = async () => {
+  //   const query = new Moralis.Query("Proposals");
+  //   const userWalletAddress = user.get("ethAddress");
+  //   query.equalTo("userWalletAddress", userWalletAddress);
+  //   const userMoralis = await query.first();
+  //   const proposalCID = userMoralis.attributes.CID;
+  //   const url = `https://gateway.moralisipfs.com/ipfs/${proposalCID}`;
+  //   const response = await fetch(url);
+  //   console.log(responseJSON.description);
+    
+  //   return response.json();
+  // };
+
+    //Gets proposal description from ipfs
+    const getProposalDescription = async () => {
+      const query = new Moralis.Query("Proposals");
+      const userWalletAddress = user.get("ethAddress");
+      query.equalTo("userWalletAddress", userWalletAddress);
+      const userMoralis = await query.first();
+      const proposalCID = userMoralis.attributes.CID;
+      const url = `https://gateway.moralisipfs.com/ipfs/${proposalCID}`;
+      const response = await fetch(url);
+      const responseJSON = await response.json();
+      
+      return responseJSON.description;
+    };
 
   //get proposal
   const getProposal = async () => {
@@ -124,24 +139,28 @@ function ModalCreateProposal(props) {
       const formattedProposal = {
         owner: proposal.owner,
         status: proposal.status,
-        votedFOr: proposal.votersFor,
-        votedAgainst: proposal.votersAgainst,
-        votedForThreshold: proposal.completeThreshold,
+        votersFor: proposal.votersFor,
+        votersAgainst: proposal.votersAgainst,
+        completeThreshold: proposal.completeThreshold,
       }
-      console.log(proposal);
-      console.log(formattedProposal);
-      return proposal;
+      // console.log(proposal);
+      // console.log(formattedProposal);
+      return formattedProposal;
     }
   };
 
     //IPFS+AVAX get in one function, putting values together in one variable
     const getFullProposal = async () => {
       const proposal = await getProposal();
-      const ipfs = await getIpfsProposal();
+      const description = await getProposalDescription();
     
       const fullProposal = {
-        proposal: proposal,
-        ipfs: ipfs
+        owner: proposal.owner,
+        status: proposal.status,
+        votersFor: proposal.votersFor,
+        votersAgainst: proposal.votersAgainst,
+        completeThreshold: proposal.completeThreshold,
+        description: description
       }
       // setDao(fullProposal);
       console.log(fullProposal)
