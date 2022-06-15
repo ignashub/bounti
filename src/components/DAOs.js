@@ -482,28 +482,24 @@ function DAOFunctions(props) {
             </Text>
           </Text>
           <Text id="modal-title" b size={18}>
-            Details:
-            <Text>Using EPNS, React, Sol, etc...</Text>
-          </Text>
-          <Text id="modal-title" b size={18}>
             Owner:
             <Text>johnster.eth</Text>
-          </Text>
-          <Text id="modal-title" b size={18}>
-            Workers:
-            <Text>crazyziu.eth, rx73.eth, hazza.eth</Text>
-          </Text>
-          <Text id="modal-title" b size={18}>
-            Reviewers:
-            <Text>Pending...</Text>
           </Text>
           <Text id="modal-title" b size={18}>
             Status:
             <Text>Waiting for Review...</Text>
           </Text>
           <Text id="modal-title" b size={18}>
-            Reward:
-            <Text>250 CRV & 50 BTI</Text>
+            Voted For:
+            <Text>Over 9000!</Text>
+          </Text>
+          <Text id="modal-title" b size={18}>
+            Voted Against:
+            <Text>420</Text>
+          </Text>
+          <Text id="modal-title" b size={18}>
+            Acceptance Threshold:
+            <Text>Atleast 50% of DAO members have to vote for</Text>
           </Text>
         </Modal.Body>
         <Modal.Footer>

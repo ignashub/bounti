@@ -1,4 +1,4 @@
-[
+{"abi": [
 	{
 		"inputs": [
 			{
@@ -33,11 +33,35 @@
 				"internalType": "uint256",
 				"name": "completeThreshold",
 				"type": "uint256"
+			},
+			{
+				"internalType": "address",
+				"name": "daoContractAddress",
+				"type": "address"
 			}
 		],
 		"name": "createProposal",
 		"outputs": [],
 		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "daoContract",
+				"type": "address"
+			}
+		],
+		"name": "getAllDaoProposals",
+		"outputs": [
+			{
+				"internalType": "string[]",
+				"name": "",
+				"type": "string[]"
+			}
+		],
+		"stateMutability": "view",
 		"type": "function"
 	},
 	{
@@ -301,4 +325,4 @@
 		"stateMutability": "view",
 		"type": "function"
 	}
-]
+]}

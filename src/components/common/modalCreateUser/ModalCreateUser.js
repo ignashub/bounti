@@ -57,7 +57,6 @@ function ModalCreateUser(props) {
   const uploadImage = async () => {
     const CIDImage = Moralis.Object.extend("CIDImage");
     const cidimage = new CIDImage();
-    console.log("test");
     const data = userPicture[0];
     console.log(data);
     const file = new Moralis.File(data.name, data);
