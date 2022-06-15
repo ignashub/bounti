@@ -3,7 +3,7 @@ import abi from "../../../utils/Daos.json";
 
 const ethers = Moralis.web3Library;
 
-const address = "0x1A8e2E734077ae13FBC2157Fbdbc69b878d19030";
+const address = "0x5DCc53E9faC64e9c6928fC5f00965B7E4eBd8bBC";
 const ABI = abi.abi;
 
 const getDaoAddress = async (daoTag) => {
@@ -22,9 +22,14 @@ const getContract = async () => {
     return new ethers.Contract(address, ABI, signer);
 }
 
+const getAllDaos = async () => {
+    const contract = await getContract();
+    return await contract.getAllDaos();
+}
+
 const checkIfMember = async (daoAddress, userAddress) => {
     const contract = await getContract();
     return await contract.checkMember(daoAddress, userAddress);
 }
 
-export {getDaoAddress, getContract, checkIfMember};
+export {getDaoAddress, getContract, checkIfMember, getAllDaos};

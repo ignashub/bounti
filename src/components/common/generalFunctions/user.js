@@ -31,6 +31,7 @@ const updateUser = async (metadata, address) => {
 
 const getAllUserDaos = async (userAddress) => {
     const userObject = await getIpfsUser(userAddress);
+    console.log("This is all user's daos: ", userObject.daos)
     return userObject.daos;
 }
 

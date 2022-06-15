@@ -26,4 +26,26 @@ const getMemberManagerContract = async () => {
     return new ethers.Contract(memberManagerAddress, memberManagerABI, signer);
 }
 
-export {getTaskManagerContract, getMemberManagerContract};
+const getAllDaoTasks = async (daoContract) => {
+    const contract = await getTaskManagerContract();
+    console.log("thiiiiis: ", daoContract)
+    const allTasks = await contract.getAllDaoTasks(daoContract);
+    const taskArray = [];
+    for (let i = 0; i < allTasks.length; i++) {
+        const taskId = allTasks[i];
+        console.log("Here: ", taskId)
+        if (taskId !== "") {
+            console.log("ukyfjhfj")
+            const res = await contract.getTask(allTasks[i])
+                .catch(err => {
+                    alert(err.data.message)
+                });
+            const task = res[0];
+            console.log("i get smth from taks: ", task.id)
+            taskArray.push(task[0]);
+        }
+    }
+    return taskArray;
+}
+
+export {getTaskManagerContract, getMemberManagerContract, getAllDaoTasks};

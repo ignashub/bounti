@@ -25,10 +25,8 @@ import ModalDAO from "./common/daoModals/ModalDAO";
 import ModalCreateProposal from "./common/modalProposals/ModalCreateProposal";
 import ModalCreateReading from "./common/modalWeeklyReading/ModalNewWeeklyReading";
 import ModalVoteOnProposal from "./common/modalProposals/ModalVoteOnProposal";
-import {getContract} from "./common/generalFunctions/daos";
-import { useMoralis } from "react-moralis";
+import {getContract, getAllDaos} from "./common/generalFunctions/daos";
 import { Moralis } from "moralis";
-import abi from "../utils/Daos.json";
 
 function DAOFunctions(props) {
 
@@ -284,18 +282,10 @@ function DAOFunctions(props) {
     }
   };
   const GetDaoMetadata = async () => {
-    const ethers = Moralis.web3Library;
-    //variables for smart contract
-    const contractAddress = "0x24dE6AE7169DaC5d2A320A066a21D381099dc22A";
-    const contractABI = abi.abi;
-    //getting all daos from the blockchain
     const DaosInfo = [];
     const { ethereum } = window;
     if (ethereum) {
-      const provider = new ethers.providers.Web3Provider(ethereum);
-      const signer = provider.getSigner();
-      const bountiContract = new ethers.Contract(contractAddress, contractABI, signer);
-      const bc = await bountiContract.getAllDaos();
+      const bc = await getAllDaos();
       const query = new Moralis.Query("DAOs");
       for ( var i = 0; i < bc.length; i++) {
         await query.select("CID").equalTo("contractAddress", bc[i]);
@@ -327,7 +317,7 @@ function DAOFunctions(props) {
       var daoInf = []
       daoInf = await GetDaoMetadata();
 
-      console.log(daosInfo[id])
+      console.log(daoInf[id])
       setInf(<Row css={{ paddingBottom: 16 }} gap={1}>
         <Container>
           <Col span={6}>
@@ -341,7 +331,7 @@ function DAOFunctions(props) {
                       textGradient: "45deg, $purple600 -20%, $pink600 100%",
                     }}
                   >
-                    {daosInfo[id].name}
+                    {daoInf[id].name}
                   </Text>
                 </Card.Header>
                 <Divider />
@@ -350,19 +340,19 @@ function DAOFunctions(props) {
                     DAO Description:
                   </Text>
                   <Text>
-                    {daosInfo[id].description}
+                    {daoInf[id].description}
                   </Text>
                   <Text id="modal-title" b size={16}>
                     DAO Technology:
                   </Text>
                   <Text>
-                    {daosInfo[id].tech}
+                    {daoInf[id].tech}
                   </Text>
                   <Text id="modal-title" b size={16}>
                     DAO Contract Address:
                   </Text>
                   <Text>
-                    {daosInfo[id].contract}
+                    {daoInf[id].contract}
                   </Text>
                   <Text id="modal-title" b size={16}>
                     Offical Site:
@@ -371,15 +361,15 @@ function DAOFunctions(props) {
                     icon
                     color="primary"
                     target="_blank"
-                    href={daosInfo[id].site}
+                    href={"https://"+daoInf[id].site}
                   >
-                    {daosInfo[id].site}
+                    {daoInf[id].site}
                   </Link>
                   <Text id="modal-title" b size={16}>
                     DAO Sections:
                   </Text>
                   <Text>
-                      {daosInfo[id].sections}
+                      {daoInf[id].sections}
                   </Text>
                 </Card.Body>
                 <Divider />
@@ -414,13 +404,16 @@ function DAOFunctions(props) {
     const DaosList = [];
     const { ethereum } = window;
     if (ethereum) {
-
-      const bountiContract = await getContract();
-      const bc = await bountiContract.getAllDaos();
+      //const bountiContract = await getContract();
+      //console.log(bountiContract)
+      //const bc = await bountiContract.getAllDaos();
+      const bc = await getAllDaos();
+      console.log(bc)
       const query = new Moralis.Query("DAOs");
       for ( var i = 0; i < bc.length; i++) {
         await query.select("CID").equalTo("contractAddress", bc[i]);
         const qAnswer = await query.first();
+        console.log(qAnswer)
         const daoCID = qAnswer.attributes.CID;
         const url = `https://gateway.moralisipfs.com/ipfs/${daoCID}`;
         const response = await fetch(url);
@@ -485,24 +478,28 @@ function DAOFunctions(props) {
             </Text>
           </Text>
           <Text id="modal-title" b size={18}>
+            Details:
+            <Text>Using EPNS, React, Sol, etc...</Text>
+          </Text>
+          <Text id="modal-title" b size={18}>
             Owner:
             <Text>johnster.eth</Text>
+          </Text>
+          <Text id="modal-title" b size={18}>
+            Workers:
+            <Text>crazyziu.eth, rx73.eth, hazza.eth</Text>
+          </Text>
+          <Text id="modal-title" b size={18}>
+            Reviewers:
+            <Text>Pending...</Text>
           </Text>
           <Text id="modal-title" b size={18}>
             Status:
             <Text>Waiting for Review...</Text>
           </Text>
           <Text id="modal-title" b size={18}>
-            Voted For:
-            <Text>Over 9000!</Text>
-          </Text>
-          <Text id="modal-title" b size={18}>
-            Voted Against:
-            <Text>420</Text>
-          </Text>
-          <Text id="modal-title" b size={18}>
-            Acceptance Threshold:
-            <Text>Atleast 50% of DAO members have to vote for</Text>
+            Reward:
+            <Text>250 CRV & 50 BTI</Text>
           </Text>
           <Text id="modal-title" b size={18}>
             Vote:

@@ -1,7 +1,5 @@
 import React, {useState} from "react";
 import { Text, Button, Modal, Input, Checkbox, Radio } from "@nextui-org/react";
-import {Moralis} from "moralis";
-import abi from "../../../utils/Daos.json";
 import {useMoralis} from "react-moralis";
 import {getIpfsUser, updateUser} from "../generalFunctions/user";
 import {getDaoAddress, getContract} from "../generalFunctions/daos";
@@ -42,8 +40,13 @@ function ModalAddNewDAO(props) {
 
   const join = async () => {
     const daoContract = await getDaoAddress(daoTag);
-    await JoinDAO(daoContract);
-    await update(daoContract);
+    await JoinDAO(daoContract)
+        .then(async () => {
+          await update(daoContract);
+        })
+        .catch(err => {
+          alert(err.data.message)
+        });
     props.onClose();
   }
 
