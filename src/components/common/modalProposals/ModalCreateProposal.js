@@ -11,6 +11,7 @@ function ModalCreateProposal(props) {
   const [proposalVotedForThreshold, setProposalVotedForThreshold] = useState(0);
   const [daoContractTag, setDaoContractTag] = useState("");
   const [proposalId, setProposalId] = useState("");
+  const [allProposals, setProposals] = useState([]);
 
   const { user } = useMoralis();
 
@@ -165,6 +166,70 @@ function ModalCreateProposal(props) {
       // setDao(fullProposal);
       console.log(fullProposal)
     }
+
+    //getting all proposals from the blockchain
+  //Addition; contract addresses need to be in correct format or else there will be a miss communication between avax and moralis
+  const getAllProposals = async () => {
+    const allProposals = [];
+    const { ethereum } = window;
+      if (ethereum) {
+        const provider = new ethers.providers.Web3Provider(ethereum);
+        const signer = provider.getSigner();
+        const proposalContract = new ethers.Contract(contractAddress, contractABI, signer);
+        const pc = await proposalContract.getAllProposal();
+        for (const proposal of pc) {
+          const query = new Moralis.Query("Proposals");
+          console.log(proposal)
+          console.log(proposal.contractAddress)
+          await query.select("CID").equalTo("contractAddress", proposal.contractAddress);
+          const qAnswer = await query.first();
+          console.log(qAnswer)
+          const proposalCID = qAnswer.attributes.CID;
+          const url = `https://gateway.moralisipfs.com/ipfs/${proposalCID}`;
+          const response = await fetch(url);
+          console.log(response)
+          const fullProposal = {
+            pc: proposal,
+            ipfs: await response.json()
+          }
+          allProposals.push(fullProposal)
+          console.log(fullProposal)
+        }
+      setProposals(allProposals);
+      }
+  }
+
+    //getting all daos from the blockchain
+  //Addition; contract addresses need to be in correct format or else there will be a miss communication between avax and moralis
+  // const getAllDAOs = async () => {
+  //   const allDaos = [];
+  //   const { ethereum } = window;
+  //     if (ethereum) {
+  //       const provider = new ethers.providers.Web3Provider(ethereum);
+  //       const signer = provider.getSigner();
+  //       const bountiContract = new ethers.Contract(contractAddress, contractABI, signer);
+  //       const bc = await bountiContract.getAllDaos();
+  //       for (const dao of bc) {
+  //         const query = new Moralis.Query("DAOs");
+  //         console.log(dao)
+  //         console.log(dao.contractAddress)
+  //         await query.select("CID").equalTo("contractAddress", dao.contractAddress);
+  //         const qAnswer = await query.first();
+  //         console.log(qAnswer)
+  //         const daoCID = qAnswer.attributes.CID;
+  //         const url = `https://gateway.moralisipfs.com/ipfs/${daoCID}`;
+  //         const response = await fetch(url);
+  //         console.log(response)
+  //         const fullDAO = {
+  //           bc: dao,
+  //           ipfs: await response.json()
+  //         }
+  //         allDaos.push(fullDAO)
+  //         console.log(fullDAO)
+  //       }
+  //     setDaos(allDaos);
+  //     }
+  // }
   
 
   return (
