@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useReducer } from "react";
 import { useMoralis } from "react-moralis";
 import { Moralis } from "moralis";
-import abi from "../utils/Bounti.json";
+import abi from "../utils/Daos.json";
 import FigureImage from "react-bootstrap/FigureImage";
 
 function Main() {

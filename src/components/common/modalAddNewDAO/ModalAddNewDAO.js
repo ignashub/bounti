@@ -1,9 +1,52 @@
-import React from "react";
+import React, {useState} from "react";
 import { Text, Button, Modal, Input, Checkbox, Radio } from "@nextui-org/react";
+import {Moralis} from "moralis";
+import abi from "../../../utils/Daos.json";
+import {useMoralis} from "react-moralis";
+import {getIpfsUser, updateUser} from "../generalFunctions/user";
+import {getDaoAddress, getContract} from "../generalFunctions/daos";
 
 
 function ModalAddNewDAO(props) {
-  const [selected, setSelected] = React.useState([]);
+
+  const {user} = useMoralis();
+
+  const [selected, setSelected] = useState([]);
+  const [daoTag, setDaoTag] = useState("");
+
+  // joining a dao
+  const JoinDAO = async (daoContract) => {
+
+    const bountiContract = await getContract();
+
+    await bountiContract.joinDao(daoContract);
+  }
+
+  const update = async (daoContract) => {
+    const address = user.get("ethAddress");
+
+    const userObject = await getIpfsUser(address);
+    userObject.daos.push(daoContract);
+    await updateUser(userObject, address);
+  }
+
+
+
+  // const getDaoAddress = async () => {
+  //   const query = new Moralis.Query("DAOs");
+  //   query.equalTo("daoTag", daoTag);
+  //   const dao = await query.first();
+  //   console.log("Thats the DAO contract that I get: ", dao.attributes.contractAddress)
+  //   return dao.attributes.contractAddress;
+  // }
+
+  const join = async () => {
+    const daoContract = await getDaoAddress(daoTag);
+    await JoinDAO(daoContract);
+    await update(daoContract);
+    props.onClose();
+  }
+
   return (
     <Modal
       closeButton
@@ -27,7 +70,8 @@ function ModalAddNewDAO(props) {
         <Text id="modal-title" b size={18}>
           DAO's Tag:
         </Text>
-        <Input placeholder="CRV-DAO" id="DAOtag"/>
+        <Input placeholder="CRV-DAO" id="DAOtag"
+               onChange={e => setDaoTag(e.target.value.trim())}/>
         <Text id="modal-title" b size={18}>
           Proof of Membership:
         </Text>
@@ -66,7 +110,7 @@ function ModalAddNewDAO(props) {
         <Button auto flat color="error" onClick={props.onClose}>
           Cancel
         </Button>
-        <Button auto onClick={props.onClose}>
+        <Button auto onClick={join}>
           Join DAO
         </Button>
       </Modal.Footer>

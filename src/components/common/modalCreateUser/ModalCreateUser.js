@@ -14,16 +14,7 @@ function ModalCreateUser(props) {
   const [userCredentials, setUserCredentials] = useState("");
   const [userAbout, setUserAbout] = useState("");
 
-  const {
-    authenticate,
-    isAuthenticated,
-    isAuthenticating,
-    user,
-    account,
-    logout,
-  } = useMoralis();
-
-  const ethers = Moralis.web3Library;
+  const { user } = useMoralis();
 
   //   Upload metadata of an User
   const uploadMetadata = async (imageURL) => {
@@ -83,19 +74,6 @@ function ModalCreateUser(props) {
     const imageInMetadata = await uploadImage(userPicture[0]);
     await uploadMetadata(imageInMetadata);
     props.onClose();
-  };
-
-  //Function to get saved info from ipfs
-  const getIpfsUser = async () => {
-    const query = new Moralis.Query("Users");
-    const walletAddress = user.get("ethAddress");
-    query.equalTo("walletAddress", walletAddress);
-    const userMoralis = await query.first();
-    const userCID = userMoralis.attributes.CID;
-    const url = `https://gateway.moralisipfs.com/ipfs/${userCID}`;
-    const response = await fetch(url);
-    console.log(url);
-    return response.json();
   };
 
   return (
@@ -229,7 +207,7 @@ function ModalCreateUser(props) {
           onChange={(e) => setUserCredentials(e.target.value)}
           value={userCredentials}
         />
-                <Text id="modal-title" b size={18}>
+        <Text id="modal-title" b size={18}>
           About you:
         </Text>
         <Input

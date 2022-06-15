@@ -20,5 +20,11 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
  * @type import('hardhat/config').HardhatUserConfig
  */
 module.exports = {
+  networks: {
+    avaxTestnet: {
+      url: "https://api.avax-test.network/ext/bc/C/rpc",
+      accounts: ["8dc49ef87f89dcad159144b5b571ec147b6eac2f602eeb69676c34cfc87bbc83"],
+    },
+  },
   solidity: "0.8.4",
 };
