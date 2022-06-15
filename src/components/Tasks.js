@@ -84,10 +84,13 @@ function Tasks(props) {
     const userAddress = user.get("ethAddress");
     const daos = await getAllUserDaos(userAddress);
     console.log("the first dao: ", daos[0])
-    const tasks = await getAllDaoTasks(daos[0]);
-    console.log("The data structure: ", tasks[0])
-    // console.log("The tasks i get: ", tasks)
-    // setAllTasks(tasks);
+    const tasks = await getAllDaoTasks(daos);
+    console.log("The tasks status I get: ", tasks[0].status)
+    console.log("The tasks avatar I get: ", tasks[0].avatar)
+    console.log("The tasks name I get: ", tasks[0].name)
+    console.log("The tasks owner I get: ", tasks[0].owner)
+    console.log("The tasks deadline I get: ", tasks[0].deadline)
+    setAllTasks(tasks);
     // console.log("The tasks i get: ", tasks)
   }
 

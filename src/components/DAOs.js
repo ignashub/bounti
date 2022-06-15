@@ -24,7 +24,7 @@ import ModalDAO from "./common/daoModals/ModalDAO";
 import ModalCreateProposal from "./common/modalProposals/ModalCreateProposal";
 import ModalCreateReading from "./common/modalWeeklyReading/ModalNewWeeklyReading";
 import ModalVoteOnProposal from "./common/modalProposals/ModalVoteOnProposal";
-import {getContract, getAllDaos} from "./common/generalFunctions/daos";
+import {getContract, getAllDaos, getDaoAvatar} from "./common/generalFunctions/daos";
 import { Moralis } from "moralis";
 
 function DAOFunctions(props) {
@@ -405,18 +405,19 @@ function DAOFunctions(props) {
       //const bc = await bountiContract.getAllDaos();
       const bc = await getAllDaos();
       console.log(bc)
-      const query = new Moralis.Query("DAOs");
-      for ( var i = 0; i < bc.length; i++) {
-        await query.select("CID").equalTo("contractAddress", bc[i]);
-        const qAnswer = await query.first();
-        console.log(qAnswer)
-        const daoCID = qAnswer.attributes.CID;
-        const url = `https://gateway.moralisipfs.com/ipfs/${daoCID}`;
-        const response = await fetch(url);
-        //make response from ipfs image/logo url
-        const responseJson = await response.json();
+      // const query = new Moralis.Query("DAOs");
+      for ( let i = 0; i < bc.length; i++) {
+        // await query.select("CID").equalTo("contractAddress", bc[i]);
+        // const qAnswer = await query.first();
+        // console.log(qAnswer)
+        // const daoCID = qAnswer.attributes.CID;
+        // const url = `https://gateway.moralisipfs.com/ipfs/${daoCID}`;
+        // const response = await fetch(url);
+        // //make response from ipfs image/logo url
+        // const responseJson = await response.json();
+        const image = await getDaoAvatar(bc[i]);
         const id = i;
-        var reply = <Grid key={i}> <Avatar size='xl' src={responseJson.image} zoomed bordered color='gradient' onClick={() => GetDaoInfo(id)} id={id} key={id}/> </Grid>
+        const reply = <Grid key={i}> <Avatar size='xl' src={image} zoomed bordered color='gradient' onClick={() => GetDaoInfo(id)} id={id} key={id}/> </Grid>
         await DaosList.push(reply);
         console.log("DAO LIST ID: "+i)
       }

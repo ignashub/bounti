@@ -32,4 +32,17 @@ const checkIfMember = async (daoAddress, userAddress) => {
     return await contract.checkMember(daoAddress, userAddress);
 }
 
-export {getDaoAddress, getContract, checkIfMember, getAllDaos};
+const getDaoAvatar = async (daoContract) => {
+    const query = new Moralis.Query("DAOs");
+    await query.select("CID").equalTo("contractAddress", daoContract);
+    const qAnswer = await query.first();
+    console.log(qAnswer)
+    const daoCID = qAnswer.attributes.CID;
+    const url = `https://gateway.moralisipfs.com/ipfs/${daoCID}`;
+    const response = await fetch(url);
+    //make response from ipfs image/logo url
+    const responseJson = await response.json();
+    return responseJson.image;
+}
+
+export {getDaoAddress, getContract, checkIfMember, getAllDaos, getDaoAvatar};
