@@ -14,6 +14,7 @@ import {
   Card,
   Divider,
   Link,
+  Radio,
 } from "@nextui-org/react";
 import { StyledBadge } from "./StyledBadge";
 import "./Tasks.css";
@@ -54,6 +55,9 @@ function DAOFunctions(props) {
   const [daoContract, setDaoContract] = useState("");
   const [daoSections, setDaoSections] = useState("");
   const [daoSite, setDaoSite] = useState("");
+
+  //states for Proposals
+  const [userVote, setUserVote] = useState(false);
 
 
   function createDAOHandler() {
@@ -498,6 +502,27 @@ function DAOFunctions(props) {
             Reward:
             <Text>250 CRV & 50 BTI</Text>
           </Text>
+          <Text id="modal-title" b size={18}>
+            Vote:
+          </Text>
+          <Radio.Group size={"sm"} color="secondary">
+          <Radio
+            value="General"
+            onChange={(e) => {
+              setUserVote(true);
+            }}
+          >
+            Voter for
+          </Radio>
+          <Radio
+            value="Bronze"
+            onChange={(e) => {
+              setUserVote(false);
+            }}
+          >
+            Vote against
+          </Radio>
+        </Radio.Group>
         </Modal.Body>
         <Modal.Footer>
           <Button auto flat color="error" onClick={closeHandler}>
