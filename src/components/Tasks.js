@@ -13,14 +13,19 @@ import {
 } from "@nextui-org/react";
 import { StyledBadge } from "./StyledBadge";
 import "./Tasks.css";
-import React from "react";
+import React, {useEffect} from "react";
 import ModalCreateTask from "./common/modalTasks/ModalCreateTask";
 import ModalTask from "./common/modalTasks/ModalTask";
 import ModalReviewTask from "./common/modalTasks/ModalReviewTask";
 import {getAllUserDaos} from "./common/generalFunctions/user"
+import {getAllDaoTasks} from "./common/generalFunctions/tasks"
 import {useMoralis} from "react-moralis";
 
 function Tasks(props) {
+
+  useEffect(() => {
+    getAllTasks();
+  }, [])
 
   const {user} = useMoralis();
 
@@ -73,6 +78,9 @@ function Tasks(props) {
   ]
 
   const getAllTasks = async () => {
+    const userAddress = user.get("ethAddress");
+    const daos = await getAllUserDaos(userAddress);
+    const tasks = await getAllDaoTasks(daos[0]);
 
   }
 

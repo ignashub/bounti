@@ -23,8 +23,12 @@ const getContract = async () => {
 }
 
 const checkIfMember = async (daoAddress, userAddress) => {
+    console.log("the address that i get in the methodddd: ", daoAddress)
+    console.log("the wallet that i get in the methoddd: ", userAddress)
     const contract = await getContract();
-    return await contract.checkMember(daoAddress, userAddress);
+    const res = await contract.checkMember(daoAddress, userAddress);
+    console.log("Answer from Dante's contract: ", res)
+    return res;
 }
 
 export {getDaoAddress, getContract, checkIfMember};

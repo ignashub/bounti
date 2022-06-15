@@ -19,6 +19,7 @@ function ModalCreateTask(props) {
 
   const [taskName, setTaskName] = useState("");
   const [taskDescription, setTaskDescription] = useState("");
+  const [deadline, setDeadline] = useState();
   const [daoTag, setDaoTag] = useState("");
   const [taskReward, setTaskReward] = useState(0);
   const [percentageForReviewers, setPercentageForReviewers] = useState(0);
@@ -37,25 +38,17 @@ function ModalCreateTask(props) {
     const Task = Moralis.Object.extend("Task");
     const task = new Task();
 
-    // console.log("Task Name: ", taskName)
-    // console.log("Task Description: ", taskDescription)
-    // // console.log("Task Details: ", taskDetails)
-    // console.log("Task Level: ", taskClearance)
-    // console.log("Task Section ID: ", taskSection)
-
-
-
     const metadata = {
       name: taskName,
       description: taskDescription,
-      // details: taskDetails,
+      deadline: deadline,
       clearance: taskClearance,
       sections: taskSection,
     };
     const daoContract = await getDaoAddress(daoTag);
     const userAddress = user.get("ethAddress");
-    const isMember = await checkIfMember(daoContract, userAddress);
-    if (isMember) {
+    // const isMember = await checkIfMember(daoContract, userAddress);
+    // if (isMember) {
       const file = new Moralis.File("file.json", {
         base64: btoa(JSON.stringify(metadata)),
       });
@@ -76,9 +69,9 @@ function ModalCreateTask(props) {
           .catch(err => {
             alert(err.data.message);
           })
-    } else {
-      alert("You are not a member of this DAO")
-    }
+    // } else {
+    //   alert("You are not a member of this DAO")
+    // }
   };
 
   // Adding a task to the blockchain
@@ -91,31 +84,29 @@ function ModalCreateTask(props) {
   }
 
   const create = async () => {
-    await createTask();
-    props.onClose();
+    try {
+      await checkDate()
+      await createTask();
+      props.onClose();
+    } catch (err) {
+      alert(err.message)
+    }
   }
 
+  const checkDate = async () => {
+    const today = new Date();
 
+    const deadlineDate = new Date(deadline);
+
+    if (deadlineDate < today) {
+      throw new Error("The deadline can not be earlier then today");
+      // alert("The deadline can not be earlier then today")
+    }
+  }
+  //
   // const check = async () => {
-  //   console.log("Task Name: ", taskName)
-  //   console.log("Task Description: ", taskDescription)
-  //   console.log("DAO Tag: ", daoTag)
-  //   let contract = "";
-  //   try {
-  //     contract = await getDaoAddress(daoTag);
-  //   } catch (err) {
-  //     alert("Errorrrr")
-  //   }
-  //   console.log("DAO contract: ", contract)
-  //   console.log("Task Level: ", taskClearance)
-  //   console.log("Task Section ID: ", taskSection)
-  //   console.log("Task Reward: ", taskReward);
-  //   console.log("Task Percentage: ", percentageForReviewers);
-  //   // console.log("Task description: ", taskDescription);
+  //   await checkDate();
   // }
-
-
-
 
   return (
     <Modal
@@ -143,6 +134,11 @@ function ModalCreateTask(props) {
         </Text>
         <Input placeholder="CRV-DAO"
         onChange={e => setDaoTag(e.target.value)}/>
+        <Text id="modal-title" b size={18}>
+          Deadline:
+        </Text>
+        <Input type="date" value={deadline}
+        onChange={e => setDeadline(e.target.value)}/>
         <Text id="modal-title" b size={18}>
           Description:
         </Text>

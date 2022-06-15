@@ -31,6 +31,7 @@ contract TaskManager is OwnableUpgradeable, ITaskManager {
 
     // @dev This struct will be used to send needed data about a Task to the front-end
     struct TaskToGet {
+        string id;
         address daoContract;
         address taskOwner;
         uint prize;
@@ -113,6 +114,7 @@ contract TaskManager is OwnableUpgradeable, ITaskManager {
     function getTask(string calldata id) public view returns (TaskToGet memory, address[] memory, address[] memory) {
         require(allTasks[id].status != SharedTypes.TaskStatus.DOES_NOT_EXIST, "A task with this ID does not exist");
         TaskToGet memory taskData;
+        taskData.id = id;
         taskData.daoContract = allTasks[id].daoContract;
         taskData.taskOwner = allTasks[id].taskOwner;
         taskData.percentageForReviewers = allTasks[id].percentageForReviewers;

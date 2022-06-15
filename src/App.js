@@ -41,21 +41,31 @@ function App() {
   const {
     authenticate,
     isAuthenticated,
-    isAuthenticating,
-    user,
-    account,
-    // logout,
+    isAuthenticating
   } = useMoralis();
 
   //login function Moralis
   const login = async () => {
-    console.log("it works");
-    if (!isAuthenticated) {
-      await authenticate({ signingMessage: "Log in using Moralis" }).catch(
-        function (error) {
-          console.log(error);
-        }
-      );
+    // console.log("it works");
+    // if (!isAuthenticated) {
+    //   await authenticate({ signingMessage: "Log in using Moralis" }).catch(
+    //     function (error) {
+    //       console.log(error);
+    //     }
+    //   );
+    // }
+    let user = Moralis.User.current();
+    if (!user) {
+      user = await Moralis.authenticate({
+        signingMessage: "Log in using Moralis",
+      })
+          .then(function (user) {
+            console.log("logged in user:", user);
+            console.log(user.get("ethAddress"));
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
     }
   };
 
