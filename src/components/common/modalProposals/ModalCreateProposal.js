@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useMoralis } from "react-moralis";
 import { Moralis } from "moralis";
 import { Text, Button, Modal, Input } from "@nextui-org/react";
@@ -17,14 +17,13 @@ function ModalCreateProposal(props) {
   const ethers = Moralis.web3Library;
 
   //variables for smart contract
-  const contractAddress = "0x8a7a1605A9a3a6aFB81f7237325D3b3aead2004e";
+  const contractAddress = "0xb532381a3a181dFa55eD97a99a781256bAa2E91a";
   const contractABI = abi.abi;
 
   //Upload metadata of a Proposal
   const uploadMetadata = async () => {
     const Proposal = Moralis.Object.extend("Proposals");
     const proposalObject = new Proposal();
-    // const userId = user.get("ethAddress");
 
     const metadata = {
       name: proposalName,
@@ -39,14 +38,15 @@ function ModalCreateProposal(props) {
     await file.saveIPFS();
 
     proposalObject.set("CID", file.hash());
-    proposalObject.set("contractAddress", user.get("ethAddress"));
+    proposalObject.set("Description", proposalDescription);
+    proposalObject.set("userWalletAddress", user.get("ethAddress"));
     console.log(file);
 
     proposalObject
       .save()
       .then(async (proposal) => {
         await setProposalId(proposal.id);
-        console.log("Proposal ID: ", proposal.id);
+        // console.log("Proposal ID: ", proposal.id);
         await addProposal(proposal.id, proposalVotedForThreshold);
       })
       .catch((err) => {
@@ -83,6 +83,7 @@ function ModalCreateProposal(props) {
     const userObject = await getIpfsUser(address);
     userObject.proposalIds.push(proposalId);
     await updateUser(userObject, address);
+    await getIpfsUser(user.get("ethAddress"));
   };
 
   //Function to upload
@@ -95,13 +96,13 @@ function ModalCreateProposal(props) {
   };
 
   //Function to get saved info from ipfs
-  const getIpfsUser = async () => {
-    const query = new Moralis.Query("Users");
-    const userContract = user.get("ethAddress");
-    query.equalTo("contractAddress", userContract);
+  const getIpfsProposal = async () => {
+    const query = new Moralis.Query("Proposals");
+    const userWalletAddress = user.get("ethAddress");
+    query.equalTo("userWalletAddress", userWalletAddress);
     const userMoralis = await query.first();
-    const userCID = userMoralis.attributes.CID;
-    const url = `https://gateway.moralisipfs.com/ipfs/${userCID}`;
+    const proposalCID = userMoralis.attributes.CID;
+    const url = `https://gateway.moralisipfs.com/ipfs/${proposalCID}`;
     const response = await fetch(url);
     console.log(url);
     return response.json();
@@ -119,10 +120,33 @@ function ModalCreateProposal(props) {
         signer
       );
       const proposal = await proposalsContract.getProposal(proposalId);
+
+      const formattedProposal = {
+        owner: proposal.owner,
+        status: proposal.status,
+        votedFOr: proposal.votersFor,
+        votedAgainst: proposal.votersAgainst,
+        votedForThreshold: proposal.completeThreshold,
+      }
       console.log(proposal);
+      console.log(formattedProposal);
       return proposal;
     }
   };
+
+    //IPFS+AVAX get in one function, putting values together in one variable
+    const getFullProposal = async () => {
+      const proposal = await getProposal();
+      const ipfs = await getIpfsProposal();
+    
+      const fullProposal = {
+        proposal: proposal,
+        ipfs: ipfs
+      }
+      // setDao(fullProposal);
+      console.log(fullProposal)
+    }
+  
 
   return (
     <Modal
@@ -189,7 +213,7 @@ function ModalCreateProposal(props) {
         <Button auto onClick={upload}>
           Create
         </Button>
-        <Button auto onClick={getProposal}>
+        <Button auto onClick={getFullProposal}>
           get
         </Button>
       </Modal.Footer>
