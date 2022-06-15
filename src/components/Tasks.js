@@ -13,7 +13,7 @@ import {
 } from "@nextui-org/react";
 import { StyledBadge } from "./StyledBadge";
 import "./Tasks.css";
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import ModalCreateTask from "./common/modalTasks/ModalCreateTask";
 import ModalTask from "./common/modalTasks/ModalTask";
 import ModalReviewTask from "./common/modalTasks/ModalReviewTask";
@@ -24,7 +24,9 @@ import {useMoralis} from "react-moralis";
 function Tasks(props) {
 
   useEffect(() => {
-    getAllTasks();
+    if (user) {
+      getAllTasks();
+    }
   }, [])
 
   const {user} = useMoralis();
@@ -33,6 +35,7 @@ function Tasks(props) {
   const [visibleCreateTask, setVisibleCreateTask] = React.useState(false);
   const [visibleTask, setVisibleTask] = React.useState(false);
   const [visibleReviewTask, setVisibleReviewTask] = React.useState(false);
+  const [allTasks, setAllTasks] = useState([]);
 
   function createTaskHandler() {
     setVisibleCreateTask(true);
@@ -80,8 +83,12 @@ function Tasks(props) {
   const getAllTasks = async () => {
     const userAddress = user.get("ethAddress");
     const daos = await getAllUserDaos(userAddress);
+    console.log("the first dao: ", daos[0])
     const tasks = await getAllDaoTasks(daos[0]);
-
+    console.log("The data structure: ", tasks[0])
+    // console.log("The tasks i get: ", tasks)
+    // setAllTasks(tasks);
+    // console.log("The tasks i get: ", tasks)
   }
 
 
@@ -283,7 +290,7 @@ function Tasks(props) {
                 </Table.Column>
               )}
             </Table.Header>
-            <Table.Body items={tasks}>
+            <Table.Body items={allTasks}>
               {(item) => (
                 <Table.Row>
                   {(columnKey) => (
