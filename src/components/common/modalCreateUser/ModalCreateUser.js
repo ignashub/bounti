@@ -14,35 +14,7 @@ function ModalCreateUser(props) {
   const [userCredentials, setUserCredentials] = useState("");
   const [userAbout, setUserAbout] = useState("");
 
-  const {
-    authenticate,
-    isAuthenticated,
-    isAuthenticating,
-    user,
-    account,
-    logout,
-  } = useMoralis();
-
-  const ethers = Moralis.web3Library;
-
-  //login function Moralis
-  const login = async () => {
-    if (!isAuthenticated) {
-      await authenticate({ signingMessage: "Log in using Moralis" }).catch(
-        function (error) {
-          console.log(error);
-        }
-      );
-    }
-  };
-
-  useEffect(() => {
-    //getAllDAOs();
-  }, []);
-
-  const logOut = async () => {
-    await logout();
-  };
+  const { user } = useMoralis();
 
   //   Upload metadata of an User
   const uploadMetadata = async (imageURL) => {
@@ -235,7 +207,7 @@ function ModalCreateUser(props) {
           onChange={(e) => setUserCredentials(e.target.value)}
           value={userCredentials}
         />
-                <Text id="modal-title" b size={18}>
+        <Text id="modal-title" b size={18}>
           About you:
         </Text>
         <Input
