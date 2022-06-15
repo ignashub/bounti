@@ -26,4 +26,3 @@ yarn-error.log*
 /artifacts/
 /cache/
 /.openzeppelin/
-/src/utils/*

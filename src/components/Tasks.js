@@ -70,107 +70,11 @@ function Tasks(props) {
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQsuemhTEun-zByzH2wxWCo5dTjrUP8v2sbJAoajF7JmXmZcHHaQ6Za0Qk5xNldQHHp1lY&usqp=CAU",
       desc: "This task needs to be done asap...",
     },
-    {
-      id: 2,
-      task: "Edit Contract",
-      dao: "Curve DAO",
-      team: "Development",
-      status: "paused",
-      age: "25",
-      avatar:
-        "https://cryptoclothing.cc/merch/curve-dao-token-crv-sticker.jpg?v=022",
-      desc: "Need to edit the main files so that...",
-    },
-    {
-      id: 3,
-      task: "Change Colours",
-      dao: "Maker DAO",
-      team: "Development",
-      status: "active",
-      age: "22",
-      avatar:
-        "https://pbs.twimg.com/profile_images/1196456510424961025/zacb-9pN_400x400.jpg",
-      desc: "The colours don't fit the design.",
-    },
-    {
-      id: 4,
-      task: "Edit UI",
-      dao: "UniSwap",
-      team: "Marketing",
-      status: "review",
-      age: "28",
-      avatar:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQsuemhTEun-zByzH2wxWCo5dTjrUP8v2sbJAoajF7JmXmZcHHaQ6Za0Qk5xNldQHHp1lY&usqp=CAU",
-      desc: "Users are having trouble finding the right...",
-    },
-    {
-      id: 5,
-      task: "Fix Bug",
-      dao: "Maker DAO",
-      team: "Sales",
-      status: "active",
-      age: "24",
-      avatar:
-        "https://pbs.twimg.com/profile_images/1196456510424961025/zacb-9pN_400x400.jpg",
-      desc: "Critical bug in the login component.",
-    },
-    {
-      id: 6,
-      task: "Fix Bug",
-      dao: "Maker DAO",
-      team: "Sales",
-      status: "active",
-      age: "24",
-      avatar:
-        "https://pbs.twimg.com/profile_images/1196456510424961025/zacb-9pN_400x400.jpg",
-      desc: "Critical bug in the login component.",
-    },
-    {
-      id: 7,
-      task: "Fix Bug",
-      dao: "Maker DAO",
-      team: "Sales",
-      status: "active",
-      age: "24",
-      avatar:
-        "https://pbs.twimg.com/profile_images/1196456510424961025/zacb-9pN_400x400.jpg",
-      desc: "Critical bug in the login component.",
-    },
-    {
-      id: 8,
-      task: "Fix Bug",
-      dao: "Maker DAO",
-      team: "Sales",
-      status: "active",
-      age: "24",
-      avatar:
-        "https://pbs.twimg.com/profile_images/1196456510424961025/zacb-9pN_400x400.jpg",
-      desc: "Critical bug in the login component.",
-    },
-    {
-      id: 9,
-      task: "Fix Bug",
-      dao: "Maker DAO",
-      team: "Sales",
-      status: "active",
-      age: "24",
-      avatar:
-        "https://pbs.twimg.com/profile_images/1196456510424961025/zacb-9pN_400x400.jpg",
-      desc: "Critical bug in the login component.",
-    },
-    {
-      id: 10,
-      task: "Fix Bug",
-      dao: "Maker DAO",
-      team: "Sales",
-      status: "active",
-      age: "24",
-      avatar:
-        "https://pbs.twimg.com/profile_images/1196456510424961025/zacb-9pN_400x400.jpg",
-      desc: "Critical bug in the login component.",
-    },
-  ];
+  ]
 
+  const getAllTasks = async () => {
+
+  }
 
 
 
