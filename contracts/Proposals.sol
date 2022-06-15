@@ -188,7 +188,7 @@ contract Proposals {
         view
         returns (string[] memory)
     {
-        // Creating a limited array with a length (size, etc.) equal to tasksIds.length
+        // Creating a limited array with a length (size, etc.) equal to proposalsIds.length
         string[] memory daoProposalIds = new string[](proposalsArray.length);
         uint256 proposalIndex = 0;
         for (uint256 i = 0; i < proposalsArray.length; i++) {
