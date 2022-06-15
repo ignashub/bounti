@@ -17,6 +17,10 @@ async function main() {
     await daos.deployed();
     // await proposals.deployed();
 
+    // Setting TaskMemberManager proxy address to TaskManager
+    await taskManager.setTaskMemberProxy(memberManager.address);
+    // Setting TaskManager proxy address to TaskMemberManager
+    await memberManager.setTaskProxy(taskManager.address);
 
     console.log("TaskManager deployed to: ", taskManager.address);
     console.log("TaskMemberManager deployed to: ", memberManager.address);

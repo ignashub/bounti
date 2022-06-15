@@ -4,34 +4,20 @@ import {Moralis} from "moralis";
 import abi from "../../../utils/Daos.json";
 import {useMoralis} from "react-moralis";
 import {getIpfsUser, updateUser} from "../generalFunctions/user";
+import {getDaoAddress, getContract} from "../generalFunctions/daos";
 
 
 function ModalAddNewDAO(props) {
 
-  const {
-    authenticate,
-    isAuthenticated,
-    isAuthenticating,
-    user,
-    // account,
-    logout,
-  } = useMoralis();
+  const {user} = useMoralis();
 
   const [selected, setSelected] = useState([]);
   const [daoTag, setDaoTag] = useState("");
 
-  const ethers = Moralis.web3Library;
-
-  //variables for smart contract
-  const contractAddress = "0x8a7a1605A9a3a6aFB81f7237325D3b3aead2004e";
-  const contractABI = abi.abi;
-
   // joining a dao
   const JoinDAO = async (daoContract) => {
-    const { ethereum } = window;
-    const provider = new ethers.providers.Web3Provider(ethereum);
-    const signer = provider.getSigner();
-    const bountiContract = new ethers.Contract(contractAddress, contractABI, signer);
+
+    const bountiContract = await getContract();
 
     await bountiContract.joinDao(daoContract);
   }
@@ -46,16 +32,16 @@ function ModalAddNewDAO(props) {
 
 
 
-  const getDaoAddress = async () => {
-    const query = new Moralis.Query("DAOs");
-    query.equalTo("daoTag", daoTag);
-    const dao = await query.first();
-    console.log("Thats the DAO contract that I get: ", dao.attributes.contractAddress)
-    return dao.attributes.contractAddress;
-  }
+  // const getDaoAddress = async () => {
+  //   const query = new Moralis.Query("DAOs");
+  //   query.equalTo("daoTag", daoTag);
+  //   const dao = await query.first();
+  //   console.log("Thats the DAO contract that I get: ", dao.attributes.contractAddress)
+  //   return dao.attributes.contractAddress;
+  // }
 
   const join = async () => {
-    const daoContract = await getDaoAddress();
+    const daoContract = await getDaoAddress(daoTag);
     await JoinDAO(daoContract);
     await update(daoContract);
     props.onClose();

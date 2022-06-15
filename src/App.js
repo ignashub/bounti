@@ -4,7 +4,7 @@ import Stake from "./components/Stake";
 import Profile from "./components/Profile";
 import Dashboard from "./components/Dashboard";
 
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
 import { Routes, Link as ReactLink, Route } from "react-router-dom";
 import {
   Grid,
@@ -26,6 +26,7 @@ import {
   LayersIcon,
   PersonIcon,
 } from "@radix-ui/react-icons";
+import {Moralis} from "moralis";
 
 function App() {
   // this is done only for testing purposes for State Management
@@ -43,7 +44,7 @@ function App() {
     isAuthenticating,
     user,
     account,
-    logout,
+    // logout,
   } = useMoralis();
 
   //login function Moralis
@@ -57,6 +58,12 @@ function App() {
       );
     }
   };
+
+  const logout = async () => {
+    await Moralis.User.logOut();
+
+    console.log("logged out");
+  }
 
   return (
     <Grid.Container className="container">
@@ -78,9 +85,15 @@ function App() {
                 <Input placeholder="Search" />
               </Grid>
               <Grid>
-                <Button auto onClick={login}>
-                  Account
-                </Button>
+                {isAuthenticated ?
+                    <Button auto color="error" onClick={logout}>
+                      Logout
+                    </Button>
+                    :
+                    <Button auto disabled={isAuthenticated} onClick={login}>
+                      Account
+                    </Button>
+                }
               </Grid>
             </Grid.Container>
           </Grid>

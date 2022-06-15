@@ -29,4 +29,9 @@ const updateUser = async (metadata, address) => {
     currentUser.save();
 }
 
-export {getIpfsUser, updateUser};
+const getAllUserDaos = async (userAddress) => {
+    const userObject = await getIpfsUser(userAddress);
+    return userObject.daos;
+}
+
+export {getIpfsUser, updateUser, getAllUserDaos};
