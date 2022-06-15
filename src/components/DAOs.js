@@ -17,24 +17,47 @@ import {
 } from "@nextui-org/react";
 import { StyledBadge } from "./StyledBadge";
 import "./Tasks.css";
-import React from "react";
+import React, {useState, useEffect} from "react";
 import ModalCreateDAO from "./common/modalCreateDAO/ModalCreateDAO";
 import ModalAddNewDAO from "./common/modalAddNewDAO/ModalAddNewDAO";
 import ModalDAO from "./common/daoModals/ModalDAO";
 import ModalCreateProposal from "./common/modalProposals/ModalCreateProposal";
 import ModalCreateReading from "./common/modalWeeklyReading/ModalNewWeeklyReading";
 import ModalVoteOnProposal from "./common/modalProposals/ModalVoteOnProposal";
+import {getContract} from "./common/generalFunctions/daos";
+
+import { useMoralis } from "react-moralis";
+import { Moralis } from "moralis";
+import abi from "../utils/Daos.json";
 
 function DAOFunctions(props) {
-  const [visible, setVisible] = React.useState(false);
-  const [visibleAddDAO, setVisibleAddDAO] = React.useState(false);
-  const [visibleAddNewDAO, setVisibleAddNewDAO] = React.useState(false);
-  const [visibleDAO, setVisibleDAO] = React.useState(false);
-  const [visibleCreateProposal, setVisibleCreateProposal] =
-    React.useState(false);
-  const [visibleCreateReading, setVisibleCreateReading] = React.useState(false);
-  const [visibleVoteOnProposal, setVisibleVoteOnProposal] =
-    React.useState(false);
+
+  useEffect(() => {
+    //GetDaoMetadata()
+    GetDaoList()
+  }, [])
+
+  const [visible, setVisible] = useState(false);
+  const [visibleAddDAO, setVisibleAddDAO] = useState(false);
+  const [visibleAddNewDAO, setVisibleAddNewDAO] = useState(false);
+  const [visibleDAO, setVisibleDAO] = useState(false);
+
+  const [visibleCreateProposal, setVisibleCreateProposal] = useState(false);
+  const [visibleCreateReading, setVisibleCreateReading] = useState(false);
+  const [visibleVoteOnProposal, setVisibleVoteOnProposal] = useState(false);
+
+  //states for DAOs
+  const [dao, setDao] = useState(null);
+  const [inf, setInf] = useState(null);
+  const [daosList, setDaosList] = useState([]);
+  const [daosInfo, setDaosInfo] = useState([]);
+  const [daoName, setDaoName] = useState("");
+  const [daoDesc, setDaoDesc] = useState("");
+  const [daoTech, setDaoTech] = useState("");
+  const [daoContract, setDaoContract] = useState("");
+  const [daoSections, setDaoSections] = useState("");
+  const [daoSite, setDaoSite] = useState("");
+
 
   function createDAOHandler() {
     setVisibleAddDAO(true);
@@ -257,79 +280,162 @@ function DAOFunctions(props) {
         return cellValue;
     }
   };
+  const GetDaoMetadata = async () => {
+    const ethers = Moralis.web3Library;
+    //variables for smart contract
+    const contractAddress = "0x24dE6AE7169DaC5d2A320A066a21D381099dc22A";
+    const contractABI = abi.abi;
+    //getting all daos from the blockchain
+    const DaosInfo = [];
+    const { ethereum } = window;
+    if (ethereum) {
+      const provider = new ethers.providers.Web3Provider(ethereum);
+      const signer = provider.getSigner();
+      const bountiContract = new ethers.Contract(contractAddress, contractABI, signer);
+      const bc = await bountiContract.getAllDaos();
+      const query = new Moralis.Query("DAOs");
+      for ( var i = 0; i < bc.length; i++) {
+        await query.select("CID").equalTo("contractAddress", bc[i]);
+        const qAnswer = await query.first();
+        const daoCID = qAnswer.attributes.CID;
+        const url = `https://gateway.moralisipfs.com/ipfs/${daoCID}`;
+        const response = await fetch(url);
+        const responseJson = await response.json();
+        const DaoInfo = {
+          contract: bc[i],
+          name: responseJson.name,
+          tag: responseJson.tag,
+          type: responseJson.type,
+          description: responseJson.description,
+          tech: responseJson.tech,
+          site: responseJson.site,
+          signature: responseJson.signature,
+          sections: responseJson.sections,
+        }
+        //console.log(DaoInfo)
+        await DaosInfo.push(DaoInfo)
+      }
+      //await setDaosInfo(DaosInfo)
+      return DaosInfo
+    }
+  }
+
+  const GetDaoInfo = async (id) => {
+      var daoInf = []
+      daoInf = await GetDaoMetadata();
+
+      console.log(daosInfo[id])
+      setInf(<Row css={{ paddingBottom: 16 }} gap={1}>
+        <Container>
+          <Col span={6}>
+            <Grid>
+              <Card>
+                <Card.Header>
+                  <Text
+                    b
+                    h3
+                    css={{
+                      textGradient: "45deg, $purple600 -20%, $pink600 100%",
+                    }}
+                  >
+                    {daosInfo[id].name}
+                  </Text>
+                </Card.Header>
+                <Divider />
+                <Card.Body css={{ py: "$10" }}>
+                  <Text id="modal-title" b size={16}>
+                    DAO Description:
+                  </Text>
+                  <Text>
+                    {daosInfo[id].description}
+                  </Text>
+                  <Text id="modal-title" b size={16}>
+                    DAO Technology:
+                  </Text>
+                  <Text>
+                    {daosInfo[id].tech}
+                  </Text>
+                  <Text id="modal-title" b size={16}>
+                    DAO Contract Address:
+                  </Text>
+                  <Text>
+                    {daosInfo[id].contract}
+                  </Text>
+                  <Text id="modal-title" b size={16}>
+                    Offical Site:
+                  </Text>
+                  <Link
+                    icon
+                    color="primary"
+                    target="_blank"
+                    href={daosInfo[id].site}
+                  >
+                    {daosInfo[id].site}
+                  </Link>
+                  <Text id="modal-title" b size={16}>
+                    DAO Sections:
+                  </Text>
+                  <Text>
+                      {daosInfo[id].sections}
+                  </Text>
+                </Card.Body>
+                <Divider />
+                <Card.Footer>
+                  <Row justify="flex-end">
+                    <Button
+                      onClick={createVoteHandler}
+                      color="secondary"
+                      size="sm"
+                    >
+                      Show More
+                    </Button>
+                    {visibleVoteOnProposal && (
+                      <ModalVoteOnProposal
+                        id={props.id}
+                        open={visibleVoteOnProposal}
+                        onClose={closeModal}
+                      />
+                    )}
+                  </Row>
+                </Card.Footer>
+              </Card>
+            </Grid>
+          </Col>
+        </Container>
+      </Row>)
+  }
+
+
+  const GetDaoList = async () => {
+    //getting all daos from the blockchain
+    const DaosList = [];
+    const { ethereum } = window;
+    if (ethereum) {
+
+      const bountiContract = await getContract();
+      const bc = await bountiContract.getAllDaos();
+      const query = new Moralis.Query("DAOs");
+      for ( var i = 0; i < bc.length; i++) {
+        await query.select("CID").equalTo("contractAddress", bc[i]);
+        const qAnswer = await query.first();
+        const daoCID = qAnswer.attributes.CID;
+        const url = `https://gateway.moralisipfs.com/ipfs/${daoCID}`;
+        const response = await fetch(url);
+        //make response from ipfs image/logo url
+        const responseJson = await response.json();
+        const id = i;
+        var reply = <Grid key={i}> <Avatar size='xl' src={responseJson.image} zoomed bordered color='gradient' onClick={() => GetDaoInfo(id)} id={id} key={id}/> </Grid>
+        await DaosList.push(reply);
+        console.log("DAO LIST ID: "+i)
+      }
+      await setDaosList(DaosList);
+    }
+  }
+
   return (
     <Container gap={1}>
       <Grid.Container gap={4}>
-        <Grid>
-          <Avatar
-            size="xl"
-            src="https://cryptoclothing.cc/merch/curve-dao-token-crv-sticker.jpg?v=022"
-            zoomed
-            bordered
-            color="gradient"
-            onClick={showDAO}
-          />
-        </Grid>
-        <Grid>
-          <Avatar
-            size="xl"
-            src="https://cryptologos.cc/logos/uniswap-uni-logo.svg?v=022"
-            zoomed
-            bordered
-            color="gradient"
-            onClick={showDAO}
-          />
-        </Grid>
-        <Grid>
-          <Avatar
-            size="xl"
-            src="https://cryptologos.cc/logos/maker-mkr-logo.svg?v=022"
-            zoomed
-            bordered
-            color="gradient"
-            onClick={showDAO}
-          />
-        </Grid>
-        <Grid>
-          <Avatar
-            size="xl"
-            src="https://upload.wikimedia.org/wikipedia/commons/a/ad/The-dao-logo.png"
-            zoomed
-            bordered
-            color="gradient"
-            onClick={showDAO}
-          />
-        </Grid>
-        <Grid>
-          <Avatar
-            size="xl"
-            src="https://cryptologos.cc/logos/balancer-bal-logo.svg?v=022"
-            zoomed
-            bordered
-            color="gradient"
-            onClick={showDAO}
-          />
-        </Grid>
-        <Grid>
-          <Avatar
-            size="xl"
-            src="https://cryptologos.cc/logos/0x-zrx-logo.svg?v=022"
-            zoomed
-            bordered
-            color="gradient"
-            onClick={showDAO}
-          />
-        </Grid>
-        <Grid>
-          <Avatar
-            size="xl"
-            src="https://www.sushi.com/_next/static/media/logo.d019d88b.png"
-            zoomed
-            bordered
-            color="gradient"
-            onClick={showDAO}
-          />
-        </Grid>
+        {daosList}
         {visibleDAO && (
           <ModalDAO id={props.id} open={visibleDAO} onClose={closeModal} />
         )}
@@ -409,84 +515,7 @@ function DAOFunctions(props) {
           </Button>
         </Modal.Footer>
       </Modal>
-      <Row css={{ paddingBottom: 16 }} gap={1}>
-        <Container>
-          <Col span={6}>
-            <Grid>
-              <Card>
-                <Card.Header>
-                  <Text
-                    b
-                    h3
-                    css={{
-                      textGradient: "45deg, $purple600 -20%, $pink600 100%",
-                    }}
-                  >
-                    DAO Name
-                  </Text>
-                </Card.Header>
-                <Divider />
-                <Card.Body css={{ py: "$10" }}>
-                  <Text id="modal-title" b size={16}>
-                    DAO Description:
-                  </Text>
-                  <Text>
-                    Curve is an exchange liquidity pool on Ethereum (like
-                    Uniswap) designed for (1) extremely efficient stablecoin
-                    trading (2) low risk, supplemental fee income for liquidity
-                    providers, without an opportunity cost.
-                  </Text>
-                  <Text id="modal-title" b size={16}>
-                    DAO Technology:
-                  </Text>
-                  <Text>Ethereum</Text>
-                  <Text id="modal-title" b size={16}>
-                    DAO Contract Address:
-                  </Text>
-                  <Text>0xD533a949740bb3306d119CC777fa900bA034cd52</Text>
-                  <Text id="modal-title" b size={16}>
-                    Offical Site:
-                  </Text>
-                  <Link
-                    icon
-                    color="primary"
-                    target="_blank"
-                    href="https://curve.fi/"
-                  >
-                    curve.fi
-                  </Link>
-                  <Text id="modal-title" b size={16}>
-                    DAO Sections:
-                  </Text>
-                  <Text>
-                    Treasury, Governance, Development, DeFi, Advertising and
-                    Social Media
-                  </Text>
-                </Card.Body>
-                <Divider />
-                <Card.Footer>
-                  <Row justify="flex-end">
-                    <Button
-                      onClick={createVoteHandler}
-                      color="secondary"
-                      size="sm"
-                    >
-                      Show More
-                    </Button>
-                    {visibleVoteOnProposal && (
-                      <ModalVoteOnProposal
-                        id={props.id}
-                        open={visibleVoteOnProposal}
-                        onClose={closeModal}
-                      />
-                    )}
-                  </Row>
-                </Card.Footer>
-              </Card>
-            </Grid>
-          </Col>
-        </Container>
-      </Row>
+        {inf}
       <Spacer y={1} />
       <Grid.Container justify="right" wrap>
         <Button.Group color="secondary" ghost>

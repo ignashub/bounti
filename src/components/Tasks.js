@@ -17,8 +17,13 @@ import React from "react";
 import ModalCreateTask from "./common/modalTasks/ModalCreateTask";
 import ModalTask from "./common/modalTasks/ModalTask";
 import ModalReviewTask from "./common/modalTasks/ModalReviewTask";
+import {getAllUserDaos} from "./common/generalFunctions/user"
+import {useMoralis} from "react-moralis";
 
 function Tasks(props) {
+
+  const {user} = useMoralis();
+
   const [visible, setVisible] = React.useState(false);
   const [visibleCreateTask, setVisibleCreateTask] = React.useState(false);
   const [visibleTask, setVisibleTask] = React.useState(false);
