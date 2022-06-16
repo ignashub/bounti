@@ -226,6 +226,20 @@ function DAOFunctions(props) {
     },
   ];
 
+  // const getAllProposals = async () => {
+  //   const userAddress = user.get("ethAddress");
+  //   const daos = await getAllUserDaos(userAddress);
+  //   console.log("the first dao: ", daos[0])
+  //   const tasks = await getAllDaoTasks(daos);
+  //   console.log("The tasks status I get: ", tasks[0].status)
+  //   console.log("The tasks avatar I get: ", tasks[0].avatar)
+  //   console.log("The tasks name I get: ", tasks[0].name)
+  //   console.log("The tasks owner I get: ", tasks[0].owner)
+  //   console.log("The tasks deadline I get: ", tasks[0].deadline)
+  //   setAllTasks(tasks);
+  //   // console.log("The tasks i get: ", tasks)
+  // }
+
   const renderCell = (vote, columnKey) => {
     const cellValue = vote[columnKey];
     switch (columnKey) {
@@ -485,22 +499,6 @@ function DAOFunctions(props) {
           <Text id="modal-title" b size={18}>
             Owner:
             <Text>johnster.eth</Text>
-          </Text>
-          <Text id="modal-title" b size={18}>
-            Workers:
-            <Text>crazyziu.eth, rx73.eth, hazza.eth</Text>
-          </Text>
-          <Text id="modal-title" b size={18}>
-            Reviewers:
-            <Text>Pending...</Text>
-          </Text>
-          <Text id="modal-title" b size={18}>
-            Status:
-            <Text>Waiting for Review...</Text>
-          </Text>
-          <Text id="modal-title" b size={18}>
-            Reward:
-            <Text>250 CRV & 50 BTI</Text>
           </Text>
           <Text id="modal-title" b size={18}>
             Vote:

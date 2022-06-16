@@ -44,6 +44,10 @@ function App() {
     isAuthenticating
   } = useMoralis();
 
+  const refreshPage = async() =>{ 
+    window.location.reload(); 
+}
+
   //login function Moralis
   const login = async () => {
     // console.log("it works");
@@ -66,12 +70,13 @@ function App() {
           .catch(function (error) {
             console.log(error);
           });
+      await refreshPage();
     }
   };
 
   const logout = async () => {
     await Moralis.User.logOut();
-
+    await refreshPage();
     console.log("logged out");
   }
 

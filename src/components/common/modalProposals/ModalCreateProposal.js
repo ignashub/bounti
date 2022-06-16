@@ -2,10 +2,14 @@ import React, { useState } from "react";
 import { useMoralis } from "react-moralis";
 import { Moralis } from "moralis";
 import { Text, Button, Modal, Input } from "@nextui-org/react";
-import abi from "../../../utils/Proposals.json";
-import { getIpfsUser, updateUser } from "../generalFunctions/user";
+import {getIpfsUser, updateUser} from "../generalFunctions/user";
+import { getProposalsContract, getFullProposalObject } from "../generalFunctions/proposals";
+import {getDaoAddress, checkIfMember} from "../generalFunctions/daos";
 
 function ModalCreateProposal(props) {
+
+  const { user } = useMoralis();
+
   const [proposalName, setProposalName] = useState("");
   const [proposalDescription, setProposalDescription] = useState("");
   const [proposalVotedForThreshold, setProposalVotedForThreshold] = useState(0);
@@ -13,16 +17,9 @@ function ModalCreateProposal(props) {
   const [proposalId, setProposalId] = useState("");
   const [allProposals, setProposals] = useState([]);
 
-  const { user } = useMoralis();
-
-  const ethers = Moralis.web3Library;
-
-  //variables for smart contract
-  const contractAddress = "0xb532381a3a181dFa55eD97a99a781256bAa2E91a";
-  const contractABI = abi.abi;
 
   //Upload metadata of a Proposal
-  const uploadMetadata = async () => {
+  const createProposal = async () => {
     const Proposal = Moralis.Object.extend("Proposals");
     const proposalObject = new Proposal();
 
@@ -31,6 +28,7 @@ function ModalCreateProposal(props) {
       description: proposalDescription,
       votedForThreshold: proposalVotedForThreshold,
     };
+    const daoContract = await getDaoAddress(daoContractTag);
 
     const file = new Moralis.File("file.json", {
       base64: btoa(JSON.stringify(metadata)),
@@ -47,190 +45,63 @@ function ModalCreateProposal(props) {
       .save()
       .then(async (proposal) => {
         await setProposalId(proposal.id);
-        // console.log("Proposal ID: ", proposal.id);
-        await addProposal(proposal.id, proposalVotedForThreshold);
+          await addProposalToAvax(daoContract, proposal.id);
       })
       .catch((err) => {
         alert(err.data.message);
       });
   };
 
-  //adding proposal to the blockchain
-  const addProposal = async (proposalId, votedForThreshold) => {
-    const { ethereum } = window;
-    const provider = new ethers.providers.Web3Provider(ethereum);
-    const signer = provider.getSigner();
-    const proposalsContract = new ethers.Contract(
-      contractAddress,
-      contractABI,
-      signer
-    );
+   // Adding a proposal to the blockchain
+   const addProposalToAvax = async (daoContract, id) => {
+    const contract = await getProposalsContract();
 
-    const query = new Moralis.Query("DAOs");
-    query.equalTo("daoTag", daoContractTag);
-    const daoMoralis = await query.first();
-    const daoContractAddress = daoMoralis.attributes.contractAddress;
+    console.log("objectId in Moralis and Proposal struct in blockchain: ", id)
 
-    await proposalsContract.createProposal(
-      proposalId,
-      votedForThreshold,
-      daoContractAddress
-    );
-  };
-
-  const update = async (proposalId) => {
-    const address = user.get("ethAddress");
-
-    const userObject = await getIpfsUser(address);
-    userObject.proposalIds.push(proposalId);
-    await updateUser(userObject, address);
-    await getIpfsUser(user.get("ethAddress"));
-  };
-
-  //Function to upload
-  const upload = async () => {
-    await uploadMetadata();
-    await addProposal();
-
-    await update(proposalId);
-    props.onClose();
-  };
-
-  //Function to get saved info from ipfs
-  // const getIpfsProposal = async () => {
-  //   const query = new Moralis.Query("Proposals");
-  //   const userWalletAddress = user.get("ethAddress");
-  //   query.equalTo("userWalletAddress", userWalletAddress);
-  //   const userMoralis = await query.first();
-  //   const proposalCID = userMoralis.attributes.CID;
-  //   const url = `https://gateway.moralisipfs.com/ipfs/${proposalCID}`;
-  //   const response = await fetch(url);
-  //   console.log(responseJSON.description);
-    
-  //   return response.json();
-  // };
-
-    //Gets proposal description from ipfs
-    const getProposalDescription = async () => {
-      const query = new Moralis.Query("Proposals");
-      const userWalletAddress = user.get("ethAddress");
-      query.equalTo("userWalletAddress", userWalletAddress);
-      const userMoralis = await query.first();
-      const proposalCID = userMoralis.attributes.CID;
-      const url = `https://gateway.moralisipfs.com/ipfs/${proposalCID}`;
-      const response = await fetch(url);
-      const responseJSON = await response.json();
-      
-      return responseJSON.description;
-    };
-
-  //get proposal
-  const getProposal = async () => {
-    const { ethereum } = window;
-    if (ethereum) {
-      const provider = new ethers.providers.Web3Provider(ethereum);
-      const signer = provider.getSigner();
-      const proposalsContract = new ethers.Contract(
-        contractAddress,
-        contractABI,
-        signer
-      );
-      const proposal = await proposalsContract.getProposal(proposalId);
-
-      const formattedProposal = {
-        owner: proposal.owner,
-        status: proposal.status,
-        votersFor: proposal.votersFor,
-        votersAgainst: proposal.votersAgainst,
-        completeThreshold: proposal.completeThreshold,
-      }
-      // console.log(proposal);
-      // console.log(formattedProposal);
-      return formattedProposal;
-    }
-  };
-
-    //IPFS+AVAX get in one function, putting values together in one variable
-    const getFullProposal = async () => {
-      const proposal = await getProposal();
-      const description = await getProposalDescription();
-    
-      const fullProposal = {
-        owner: proposal.owner,
-        status: proposal.status,
-        votersFor: proposal.votersFor,
-        votersAgainst: proposal.votersAgainst,
-        completeThreshold: proposal.completeThreshold,
-        description: description
-      }
-      // setDao(fullProposal);
-      console.log(fullProposal)
-    }
-
-    //getting all proposals from the blockchain
-  //Addition; contract addresses need to be in correct format or else there will be a miss communication between avax and moralis
-  const getAllProposals = async () => {
-    const allProposals = [];
-    const { ethereum } = window;
-      if (ethereum) {
-        const provider = new ethers.providers.Web3Provider(ethereum);
-        const signer = provider.getSigner();
-        const proposalContract = new ethers.Contract(contractAddress, contractABI, signer);
-        const pc = await proposalContract.getAllProposal();
-        for (const proposal of pc) {
-          const query = new Moralis.Query("Proposals");
-          console.log(proposal)
-          console.log(proposal.contractAddress)
-          await query.select("CID").equalTo("contractAddress", proposal.contractAddress);
-          const qAnswer = await query.first();
-          console.log(qAnswer)
-          const proposalCID = qAnswer.attributes.CID;
-          const url = `https://gateway.moralisipfs.com/ipfs/${proposalCID}`;
-          const response = await fetch(url);
-          console.log(response)
-          const fullProposal = {
-            pc: proposal,
-            ipfs: await response.json()
-          }
-          allProposals.push(fullProposal)
-          console.log(fullProposal)
-        }
-      setProposals(allProposals);
-      }
+    await contract.createProposal(id, proposalVotedForThreshold, daoContract);
   }
 
-    //getting all daos from the blockchain
-  //Addition; contract addresses need to be in correct format or else there will be a miss communication between avax and moralis
-  // const getAllDAOs = async () => {
-  //   const allDaos = [];
+  //adding proposal to the blockchain
+  // const addProposal = async (proposalId, votedForThreshold) => {
   //   const { ethereum } = window;
-  //     if (ethereum) {
-  //       const provider = new ethers.providers.Web3Provider(ethereum);
-  //       const signer = provider.getSigner();
-  //       const bountiContract = new ethers.Contract(contractAddress, contractABI, signer);
-  //       const bc = await bountiContract.getAllDaos();
-  //       for (const dao of bc) {
-  //         const query = new Moralis.Query("DAOs");
-  //         console.log(dao)
-  //         console.log(dao.contractAddress)
-  //         await query.select("CID").equalTo("contractAddress", dao.contractAddress);
-  //         const qAnswer = await query.first();
-  //         console.log(qAnswer)
-  //         const daoCID = qAnswer.attributes.CID;
-  //         const url = `https://gateway.moralisipfs.com/ipfs/${daoCID}`;
-  //         const response = await fetch(url);
-  //         console.log(response)
-  //         const fullDAO = {
-  //           bc: dao,
-  //           ipfs: await response.json()
-  //         }
-  //         allDaos.push(fullDAO)
-  //         console.log(fullDAO)
-  //       }
-  //     setDaos(allDaos);
-  //     }
-  // }
-  
+  //   const provider = new ethers.providers.Web3Provider(ethereum);
+  //   const signer = provider.getSigner();
+  //   const proposalsContract = new ethers.Contract(
+  //     contractAddress,
+  //     contractABI,
+  //     signer
+  //   );
+
+  //   const query = new Moralis.Query("DAOs");
+  //   query.equalTo("daoTag", daoContractTag);
+  //   const daoMoralis = await query.first();
+  //   const daoContractAddress = daoMoralis.attributes.contractAddress;
+
+  //   await proposalsContract.createProposal(
+  //     proposalId,
+  //     votedForThreshold,
+  //     daoContractAddress
+  //   );
+  // };
+
+  //updates user with the proposal
+  const update = async (proposalId) => {
+    const userWallet = user.get("ethAddress");
+
+    const userObject = await getIpfsUser(userWallet);
+    userObject.proposalIds.push(proposalId);
+    await updateUser(userObject, userWallet);
+  };
+
+  const create = async () => {
+    try {
+      await createProposal();
+      await update(proposalId)
+      props.onClose();
+    } catch (err) {
+      alert(err.message)
+    }
+  }
 
   return (
     <Modal
@@ -294,10 +165,10 @@ function ModalCreateProposal(props) {
         <Button auto flat color="error" onClick={props.onClose}>
           Cancel
         </Button>
-        <Button auto onClick={upload}>
+        <Button auto onClick={create}>
           Create
         </Button>
-        <Button auto onClick={getFullProposal}>
+        <Button auto onClick={getFullProposalObject(user.get("ethAddress"), proposalId)}>
           get
         </Button>
       </Modal.Footer>
