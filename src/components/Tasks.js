@@ -36,13 +36,21 @@ function Tasks(props) {
   const [visibleTask, setVisibleTask] = React.useState(false);
   const [visibleReviewTask, setVisibleReviewTask] = React.useState(false);
   const [allTasks, setAllTasks] = useState([]);
+  const [array, setArray] = useState([]);
+
+  const [myMap, setMyMap] = useState(new Map());
+  const updateMap = async (k,v) => {
+    await setMyMap(new Map(myMap.set(k,v)));
+  }
 
   function createTaskHandler() {
     setVisibleCreateTask(true);
   }
 
-  function viewTaskHandler() {
-    setVisibleTask(true);
+  async function viewTaskHandler(smth) {
+    console.log("firstly: ", smth)
+    await setVisibleTask(true);
+    console.log("and nowwwwwwwwwwww: ", smth)
   }
 
   function closeModal() {
@@ -61,7 +69,7 @@ function Tasks(props) {
     console.log("closed");
   };
   const columns = [
-    { name: "TASK", uid: "task" },
+    { name: "TASK", uid: "name" },
     { name: "DAO", uid: "dao" },
     { name: "STATUS", uid: "status" },
     { name: "ACTIONS", uid: "actions" },
@@ -72,7 +80,7 @@ function Tasks(props) {
       task: "Implement Protocol",
       dao: "UniSwap",
       team: "Management",
-      status: "active",
+      status: "In progress",
       age: "29",
       avatar:
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQsuemhTEun-zByzH2wxWCo5dTjrUP8v2sbJAoajF7JmXmZcHHaQ6Za0Qk5xNldQHHp1lY&usqp=CAU",
@@ -94,21 +102,37 @@ function Tasks(props) {
     // console.log("The tasks i get: ", tasks)
   }
 
+  const getBadgeType = (status) => {
+    switch (status) {
+      case "Pending":
+        return "pending";
+      case "In progress":
+        return "in_progress";
+      case "Review":
+        return "review";
+      case "Completed":
+        return "completed";
+      default:
+        return "default";
+    }
+  }
 
-
-
-
-
-
-
-
-
+  const getModal = async (task) => {
+    console.log("here we areeeeeeeeeeeeeee")
+    task.show = true;
+    return (<ModalTask
+        id={task.id}
+        open={true}
+        onClose={closeModal}
+        task={task}
+    />);
+  }
 
 
   const renderCell = (task, columnKey) => {
     const cellValue = task[columnKey];
     switch (columnKey) {
-      case "task":
+      case "name":
         return (
           <Col css={{ paddingLeft: 0 }}>
             <Row>
@@ -137,9 +161,12 @@ function Tasks(props) {
           </Col>
         );
       case "status":
-        return <StyledBadge type={task.status}>{cellValue}</StyledBadge>;
+
+        return <StyledBadge type={getBadgeType(task.status)}>{cellValue}</StyledBadge>;
 
       case "actions":
+        // updateMap(task.id, false)
+        // setArray( arr => [...arr, `${arr.length}`]);
         return (
           <Row justify="center" align="center">
             <Col css={{ d: "flex" }}>
@@ -147,18 +174,23 @@ function Tasks(props) {
               <Tooltip
                 content="See task details"
                 color="error"
-                onClick={() => console.log("Open more info", task.id)}
+                onClick={() => {
+                  console.log("Task id here: ", task.id);
+                }}
               >
-                <Button size="sm" color="secondary" onClick={viewTaskHandler}>
+                <Button size="sm" color="secondary" onClick={ () => {
+                  viewTaskHandler("smth")
+
+                }}>
                   More Info
                 </Button>
-                {visibleTask && (
+
                   <ModalTask
-                    id={props.id}
+                    id={task.id}
                     open={visibleTask}
                     onClose={closeModal}
+                    task={allTasks[1]}
                   />
-                )}
               </Tooltip>
             </Col>
           </Row>
@@ -213,7 +245,7 @@ function Tasks(props) {
                 </Table.Column>
               )}
             </Table.Header>
-            <Table.Body items={tasks}>
+            <Table.Body items={allTasks}>
               {(item) => (
                 <Table.Row>
                   {(columnKey) => (
@@ -253,7 +285,7 @@ function Tasks(props) {
                 </Table.Column>
               )}
             </Table.Header>
-            <Table.Body items={tasks}>
+            <Table.Body items={allTasks}>
               {(item) => (
                 <Table.Row>
                   {(columnKey) => (
@@ -293,7 +325,7 @@ function Tasks(props) {
                 </Table.Column>
               )}
             </Table.Header>
-            <Table.Body items={allTasks}>
+            <Table.Body items={tasks}>
               {(item) => (
                 <Table.Row>
                   {(columnKey) => (

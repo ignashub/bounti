@@ -1,6 +1,7 @@
 import abi1 from "../../../utils/TaskManager.json";
 import abi2 from "../../../utils/TaskMemberManager.json";
-import {getDaoAvatar} from "./daos";
+import {getDaoAvatar, getDaoName} from "./daos";
+import {getUserAlias} from "./user";
 const {Moralis} = require("moralis");
 
 
@@ -30,32 +31,53 @@ const getMemberManagerContract = async () => {
     return new ethers.Contract(memberManagerAddress, memberManagerABI, signer);
 }
 
-const getFullTaskObject = async (data, workers, reviewers) => {
+const getFullTaskObject = async (i, data, workers, reviewers) => {
     const getAvatar = await getDaoAvatar(data.daoContract);
     const ipfsData = await getTaskIpfs(data.id);
+    const daoName = await getDaoName(data.daoContract);
+    const owner = await getUserAlias(data.taskOwner);
     const task = {
-        id: data.id,
+        id: i,
+        realId: data.id,
         reward: data.prize,
         status: status[data.status],
         reviewerPercentage: data.percentageForReviewers,
         avatar: getAvatar,
-        dao: data.daoContract,
-        owner: data.taskOwner,
+        dao: daoName,
+        owner: owner,
         name: ipfsData.name,
         description: ipfsData.description,
         clearance: ipfsData.clearance,
         deadline: ipfsData.deadline,
         sections: ipfsData.sections,
         workers: workers,
-        reviewers: reviewers
+        reviewers: reviewers,
+        show: false
     }
 
     return task;
 }
 
+const getAllAlias = async (workers, reviewers) => {
+    const workersAlias = [];
+    const reviewersAlias = [];
+    for (let i = 0; i < workers.length; i++) {
+        const alias = await getUserAlias(workers[i]);
+        console.log("Someone: ", alias)
+        workersAlias.push(alias);
+    }
+    for (let i = 0; i < reviewers.length; i++) {
+        const alias = await getUserAlias(reviewers[i]);
+        console.log("Someone: ", alias)
+        reviewersAlias.push(alias);
+    }
+    return {workersAlias, reviewersAlias};
+}
+
 const getAllDaoTasks = async (daoContracts, userAddress) => {
     const contract = await getTaskManagerContract();
     const taskArray = [];
+    let index = 1; // should be 0
     for (let k = 0; k < daoContracts.length; k++) {
         if (k < (daoContracts.length -1) &&  daoContracts[k+1] === daoContracts[k]) {
             continue;
@@ -70,9 +92,11 @@ const getAllDaoTasks = async (daoContracts, userAddress) => {
                     });
                 if (res[0].status === 1 || res[1].includes(userAddress) || res[2].includes(userAddress)) {
                     const task = res[0];
-                    const fullTask = await getFullTaskObject(task, res[1], res[2]);
-                    // task.status = status[task.status];
+                    const {workersAlias, reviewersAlias} = await getAllAlias(res[1], res[2]);
+                    console.log("workersAlias or smth: ", workersAlias)
+                    const fullTask = await getFullTaskObject(index, task, workersAlias, reviewersAlias);
                     taskArray.push(fullTask);
+                    index++;
                 }
             }
         }

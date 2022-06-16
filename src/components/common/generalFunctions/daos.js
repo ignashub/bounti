@@ -10,7 +10,7 @@ const getDaoAddress = async (daoTag) => {
     const query = new Moralis.Query("DAOs");
     query.equalTo("daoTag", daoTag);
     const dao = await query.first();
-    console.log("Thats the DAO contract that I get: ", dao.attributes.contractAddress)
+    // console.log("Thats the DAO contract that I get: ", dao.attributes.contractAddress)
     return dao.attributes.contractAddress;
 }
 
@@ -33,6 +33,12 @@ const checkIfMember = async (daoAddress, userAddress) => {
 }
 
 const getDaoAvatar = async (daoContract) => {
+    //make response from ipfs image/logo url
+    const responseJson = await getIpfsData(daoContract);
+    return responseJson.image;
+}
+
+const getIpfsData = async (daoContract) => {
     const query = new Moralis.Query("DAOs");
     await query.select("CID").equalTo("contractAddress", daoContract);
     const qAnswer = await query.first();
@@ -41,8 +47,12 @@ const getDaoAvatar = async (daoContract) => {
     const url = `https://gateway.moralisipfs.com/ipfs/${daoCID}`;
     const response = await fetch(url);
     //make response from ipfs image/logo url
-    const responseJson = await response.json();
-    return responseJson.image;
+    return await response.json();
 }
 
-export {getDaoAddress, getContract, checkIfMember, getAllDaos, getDaoAvatar};
+const getDaoName = async (daoContract) => {
+    const response = await getIpfsData(daoContract);
+    return response.name;
+}
+
+export {getDaoAddress, getContract, checkIfMember, getAllDaos, getDaoAvatar, getDaoName};

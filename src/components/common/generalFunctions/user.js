@@ -3,10 +3,15 @@ import {Moralis} from "moralis";
 
 //Function to get saved info from ipfs
 const getIpfsUser = async (address) => {
-    const query = new Moralis.Query("Users");
-    query.equalTo("walletAddress", address);
-    const userMoralis = await query.first();
-    const userCID = userMoralis.attributes.CID;
+    console.log("this is the address: ", address.toLowerCase().trim())
+    const Users = Moralis.Object.extend("Users");
+    const query = new Moralis.Query(Users);
+    query.equalTo("walletAddress", address.toLowerCase());
+    console.log("thats the query: ", query)
+    const currentUser = await query.first();
+    console.log("attributes over there: ", currentUser)
+    const userCID = currentUser.attributes.CID;
+    console.log("usercid: ", userCID)
     const url = `https://gateway.moralisipfs.com/ipfs/${userCID}`;
     const response = await fetch(url);
     console.log(url);
@@ -35,4 +40,10 @@ const getAllUserDaos = async (userAddress) => {
     return userObject.daos;
 }
 
-export {getIpfsUser, updateUser, getAllUserDaos};
+const getUserAlias = async (userAddress) => {
+    console.log("the user: ", userAddress)
+    const user = await getIpfsUser(userAddress);
+    return user.alias;
+}
+
+export {getIpfsUser, updateUser, getAllUserDaos, getUserAlias};
