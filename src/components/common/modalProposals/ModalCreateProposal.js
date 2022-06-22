@@ -2,12 +2,14 @@ import React, { useState } from "react";
 import { useMoralis } from "react-moralis";
 import { Moralis } from "moralis";
 import { Text, Button, Modal, Input } from "@nextui-org/react";
-import {getIpfsUser, updateUser} from "../generalFunctions/user";
-import { getProposalsContract, getFullProposalObject } from "../generalFunctions/proposals";
-import {getDaoAddress, checkIfMember} from "../generalFunctions/daos";
+import { getIpfsUser, updateUser } from "../generalFunctions/user";
+import {
+  getProposalsContract,
+  getFullProposalObject,
+} from "../generalFunctions/proposals";
+import { getDaoAddress, checkIfMember } from "../generalFunctions/daos";
 
 function ModalCreateProposal(props) {
-
   const { user } = useMoralis();
 
   const [proposalName, setProposalName] = useState("");
@@ -16,7 +18,6 @@ function ModalCreateProposal(props) {
   const [daoContractTag, setDaoContractTag] = useState("");
   const [proposalId, setProposalId] = useState("");
   const [allProposals, setProposals] = useState([]);
-
 
   //Upload metadata of a Proposal
   const createProposal = async () => {
@@ -37,7 +38,6 @@ function ModalCreateProposal(props) {
     await file.saveIPFS();
 
     proposalObject.set("CID", file.hash());
-    proposalObject.set("Description", proposalDescription);
     proposalObject.set("userWalletAddress", user.get("ethAddress"));
     console.log(file);
 
@@ -45,21 +45,21 @@ function ModalCreateProposal(props) {
       .save()
       .then(async (proposal) => {
         await setProposalId(proposal.id);
-          await addProposalToAvax(daoContract, proposal.id);
+        await addProposalToAvax(daoContract, proposal.id);
       })
       .catch((err) => {
         alert(err.data.message);
       });
   };
 
-   // Adding a proposal to the blockchain
-   const addProposalToAvax = async (daoContract, id) => {
+  // Adding a proposal to the blockchain
+  const addProposalToAvax = async (daoContract, id) => {
     const contract = await getProposalsContract();
 
-    console.log("objectId in Moralis and Proposal struct in blockchain: ", id)
+    console.log("objectId in Moralis and Proposal struct in blockchain: ", id);
 
     await contract.createProposal(id, proposalVotedForThreshold, daoContract);
-  }
+  };
 
   //adding proposal to the blockchain
   // const addProposal = async (proposalId, votedForThreshold) => {
@@ -96,12 +96,12 @@ function ModalCreateProposal(props) {
   const create = async () => {
     try {
       await createProposal();
-      await update(proposalId)
+      await update(proposalId);
       props.onClose();
     } catch (err) {
-      alert(err.message)
+      alert(err.message);
     }
-  }
+  };
 
   return (
     <Modal
@@ -168,7 +168,10 @@ function ModalCreateProposal(props) {
         <Button auto onClick={create}>
           Create
         </Button>
-        <Button auto onClick={getFullProposalObject(user.get("ethAddress"), proposalId)}>
+        <Button
+          auto
+          onClick={getFullProposalObject(user.get("ethAddress"), proposalId)}
+        >
           get
         </Button>
       </Modal.Footer>
