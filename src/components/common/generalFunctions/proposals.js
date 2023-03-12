@@ -62,7 +62,7 @@ const getFullProposalObject = async (userWalletAddress, proposalId) => {
   return proposal;
 };
 
-const getAllDaoProposals = async (daoContracts) => {
+const getAllDaoProposals = async (userWalletAddress, daoContracts) => {
   const contract = await getProposalsContract();
   const proposalsArray = [];
   for (let k = 0; k < daoContracts.length; k++) {
